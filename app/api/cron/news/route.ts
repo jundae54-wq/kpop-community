@@ -6,7 +6,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const secret = searchParams.get('secret')
 
-    // Simple security check
+    // Simple security check (Authorization)
     if (secret !== process.env.CRON_SECRET && secret !== 'test') {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -21,21 +21,40 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Failed to discover new article source' }, { status: 500 })
     }
 
-    // 3. Process
+    // 3. Process (Scrape + AI)
     const result = await processNewsArticle(targetUrl)
 
     if (!result) {
         return NextResponse.json({ error: 'Failed to process news' }, { status: 500 })
     }
 
-    // 3. Save to DB
+    // 4. Save to DB
     const supabase = await createClient()
 
-    // Find bot user (admin or first user)
-    const { data: users } = await supabase.from('profiles').select('id').limit(1)
-    const botId = users && users.length > 0 ? users[0].id : null
+    // Ensure NO DUPLICATES (Check if recent post has same title)
+    const { data: existing } = await supabase.from('posts')
+        .select('id')
+        .eq('title', result.title)
+        .limit(1)
 
-    if (!botId) {
+    if (existing && existing.length > 0) {
+        return NextResponse.json({ message: 'Article already exists, skipping.', title: result.title })
+    }
+
+    // Find a user to act as the Author
+    // Ideally: 'jundae54@gmail.com' (The Admin) or any random user if admin not found
+    const ADMIN_EMAIL = 'jundae54@gmail.com'
+
+    // Try to find admin profile first
+    let { data: author } = await supabase.from('profiles').select('id').eq('email', ADMIN_EMAIL).single()
+
+    // If not found (admin hasn't logged in yet?), pick ANY user
+    if (!author) {
+        const { data: anyUser } = await supabase.from('profiles').select('id').limit(1).single()
+        author = anyUser
+    }
+
+    if (!author) {
         return NextResponse.json({ error: 'No user found to act as bot' }, { status: 500 })
     }
 
@@ -43,8 +62,8 @@ export async function GET(request: Request) {
         title: result.title,
         content: result.content,
         image_url: result.image_url,
-        author_id: botId,
-        // We could look up a 'News' group ID here
+        author_id: author.id,
+        // We could look up a 'News' group ID here if we had one
     }).select()
 
     if (error) {

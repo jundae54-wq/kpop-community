@@ -2,7 +2,7 @@ import * as cheerio from 'cheerio'
 import OpenAI from 'openai'
 import { createClient } from './supabase/server'
 
-// Initialize OpenAI (safe check for key)
+// Initialize OpenAI
 const openai = process.env.OPENAI_API_KEY
     ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
     : null
@@ -27,12 +27,35 @@ export async function scrapeNaverEnt(url: string): Promise<{ title: string; cont
         const html = await response.text()
         const $ = cheerio.load(html)
 
-        // Selectors optimized for common KR news sites (Generic fallback)
-        const title = $('h2.end_tit').first().text().trim() || $('title').text().trim()
-        const content = $('#articeBody').text().trim() || $('article').text().trim() || $('body').text().trim()
-        const image = $('img#img1').attr('src') || $('meta[property="og:image"]').attr('content')
+        // 1. Clean up script/style tags
+        $('script').remove()
+        $('style').remove()
 
-        if (!title || !content) return null
+        // 2. Extract Title (Try multiple common selectors)
+        const title =
+            $('h2.end_tit').first().text().trim() ||
+            $('.media_end_head_headline').text().trim() ||
+            $('h2.heading').text().trim() ||
+            $('title').text().trim()
+
+        // 3. Extract Content
+        const content =
+            $('#articeBody').text().trim() ||
+            $('#dic_area').text().trim() ||
+            $('.go_trans').text().trim() ||
+            $('.news_end').text().trim()
+
+        // 4. Extract Image (High res preferred)
+        let image =
+            $('img#img1').attr('data-src') ||
+            $('img#img1').attr('src') ||
+            $('.media_end_head_photo_img').attr('src') ||
+            $('meta[property="og:image"]').attr('content')
+
+        if (!title || !content) {
+            console.log('Skipping: Missing title or content', url)
+            return null
+        }
 
         return { title, content, image }
     } catch (error) {
@@ -53,21 +76,18 @@ export async function findLatestArticleUrl(listingUrl: string): Promise<string |
         const html = await response.text()
         const $ = cheerio.load(html)
 
-        // Naver Mobile Ranking specific selector (heuristic)
-        // Adjust based on actual page structure. Common pattern for Naver mobile lists:
-        // li.common_list_item > a
-        // or .ranking_list > li > a
-
-        // Let's try a few common ones or just find the first link that looks like an article
-        // /article/oid/aid pattern is common in Naver
-
         let foundUrl: string | null = null
 
+        // Naver Ranking Listing (Mobile) often uses these classes
+        // Look for the first link that is a valid article
         $('a').each((_, el) => {
             if (foundUrl) return
             const href = $(el).attr('href')
-            if (href && href.includes('/article/')) {
-                // Ensure absolute URL
+            // Filter for article links (usually contains /article/ or /read/)
+            if (href && (href.includes('/article/') || href.includes('/read/'))) {
+                // Ignore "ranking" self-links
+                if (href.includes('ranking')) return
+
                 if (href.startsWith('http')) {
                     foundUrl = href
                 } else {
@@ -94,37 +114,41 @@ export async function processNewsArticle(url: string) {
     let translatedTitle = ''
 
     if (openai) {
-        const completion = await openai.chat.completions.create({
-            messages: [
-                {
-                    role: "system",
-                    content: "You are a K-Pop news editor for Brazilian fans. You will be given a Korean entertainment article. Your task is to: 1. Translate the title to Portuguese. 2. Summarize the key facts of the article into a short, engaging paragraph in Portuguese (avoiding copyright issues by not translating verbatim). Return JSON: { title: string, summary: string }."
-                },
-                { role: "user", content: `TITLE: ${raw.title}\n\nCONTENT: ${raw.content.substring(0, 1500)}` }
-            ],
-            model: "gpt-4o-mini",
-            response_format: { type: "json_object" }
-        })
+        try {
+            const completion = await openai.chat.completions.create({
+                messages: [
+                    {
+                        role: "system",
+                        content: `You are a professional K-Pop news editor for Brazilian fans.
+Task:
+1. Translate the title to Portuguese.
+2. Read the Korean article and write a **summary in Portuguese** (about 2-3 paragraphs).
+3. Do NOT simply translate word-for-word. Summarize the key facts to avoid copyright issues.
+4. Tone: Exciting, engaging, suitable for a community.
+5. Return strictly JSON format: { "title": "...", "content": "..." }`
+                    },
+                    { role: "user", content: `TITLE: ${raw.title}\n\nCONTENT: ${raw.content.substring(0, 2000)}` }
+                ],
+                model: "gpt-4o-mini",
+                response_format: { type: "json_object" }
+            })
 
-        const result = JSON.parse(completion.choices[0].message.content || '{}')
-        summaryPt = result.summary || "Resumo indisponível."
-        translatedTitle = result.title || raw.title
+            const result = JSON.parse(completion.choices[0].message.content || '{}')
+            summaryPt = result.content || "Resumo indisponível."
+            translatedTitle = result.title || raw.title
+        } catch (e) {
+            console.error('OpenAI Error:', e)
+            summaryPt = "Erro ao gerar resumo."
+            translatedTitle = raw.title
+        }
     } else {
-        // Fallback if no API Key
-        summaryPt = "[MOCK] AI Summarization requires OpenAI Key. Content: " + raw.content.substring(0, 100) + "..."
-        translatedTitle = "K-News Check"
+        summaryPt = "⚠️ OpenAI API Key missing. Please configure it in Vercel.\n\nRaw Content (KR): " + raw.content.substring(0, 100) + "..."
+        translatedTitle = raw.title
     }
-
-    // 3. Save to DB (as 'News Bot' or similar)
-    const supabase = await createClient()
-
-    // Create a specialized bot user profile if not exists (conceptual - usually we just pick a system ID)
-    // For now, we will link to the current user or a specific Bot ID. 
-    // We'll create a post directly.
 
     return {
         title: translatedTitle,
-        content: `${summaryPt}\n\nRunning Source: [Link](${url})`,
+        content: `${summaryPt}\n\nSource: [Naver News](${url})`,
         image_url: raw.image
     }
 }

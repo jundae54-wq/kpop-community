@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { deletePost, deleteComment } from '../actions'
+import { deletePost, deleteComment } from '../../actions'
 
 const ADMIN_EMAIL = 'jundae54@gmail.com'
 

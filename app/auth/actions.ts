@@ -30,22 +30,35 @@ export async function signup(formData: FormData) {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
     const fullName = formData.get('fullName') as string
-    const origin = (await headers()).get('origin')
 
-    const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-            emailRedirectTo: `${origin}/auth/callback`,
-            data: {
-                full_name: fullName,
-                avatar_url: `https://api.dicebear.com/9.x/micah/svg?seed=${Math.random()}`, // Random avatar
-            }
-        },
-    })
+    // Robust origin detection: prefer env var (Vercel automatic), fallback to headers
+    const origin = process.env.NEXT_PUBLIC_SITE_URL ||
+        process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
+        (await headers()).get('origin') || 'http://localhost:3000'
 
-    if (error) {
-        redirect('/login?error=Could not create user')
+    try {
+        const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                emailRedirectTo: `${origin}/auth/callback`,
+                data: {
+                    full_name: fullName,
+                    avatar_url: `https://api.dicebear.com/9.x/lorelei/svg?seed=${Math.random()}`,
+                }
+            },
+        })
+
+        if (error) {
+            console.error('Signup error:', error)
+            redirect('/signup?error=' + encodeURIComponent(error.message))
+        }
+    } catch (e: any) {
+        if (e?.message?.includes('NEXT_REDIRECT')) {
+            throw e // Let Next.js redirect handle it
+        }
+        console.error('Unexpected signup error:', e)
+        redirect('/signup?error=Something went wrong. Please try again.')
     }
 
     revalidatePath('/', 'layout')

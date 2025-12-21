@@ -59,17 +59,17 @@ export default async function PostPage({ params }: Props) {
         .order('created_at', { ascending: true })
 
     return (
-        <div className="mx-auto max-w-3xl py-12 px-4">
+        <div className="mx-auto max-w-3xl py-8 sm:py-12 px-4">
             <ViewTracker postId={post.id} />
             {/* Post Content */}
-            <article className="mb-12">
+            <article className="mb-8 sm:mb-12">
                 <header className="mb-6">
-                    <div className="flex items-center gap-2 text-sm text-zinc-400 mb-4">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-zinc-400 mb-3 sm:mb-4">
                         {post.group && <span className="text-brand font-medium">#{post.group.name}</span>}
                         <span>•</span>
                         <span>{new Date(post.created_at).toLocaleDateString()}</span>
                     </div>
-                    <h1 className="text-4xl font-bold text-white mb-4">{post.title}</h1>
+                    <h1 className="text-2xl sm:text-4xl font-bold text-white mb-4 leading-tight">{post.title}</h1>
                     <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-zinc-700 overflow-hidden">
                             {post.author?.avatar_url ? (

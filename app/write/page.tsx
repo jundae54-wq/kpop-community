@@ -20,7 +20,7 @@ export default async function WritePage() {
     const actors = groups?.filter(g => g.type === 'actor') || []
 
     return (
-        <div className="mx-auto max-w-xl py-12 px-4">
+        <div className="mx-auto max-w-xl py-8 sm:py-12 px-4">
             <h1 className="text-2xl font-bold text-white mb-6">Write a Post</h1>
 
             <form action={createPost} className="space-y-6">

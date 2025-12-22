@@ -10,7 +10,8 @@ export default async function Navbar() {
     const { data: { user } } = await supabase.auth.getUser()
 
     // Get locale from header (set by middleware)
-    const locale = headers().get('x-locale') || 'en'
+    const headerList = await headers()
+    const locale = headerList.get('x-locale') || 'en'
     const dict = await getDictionary(locale)
 
     return (

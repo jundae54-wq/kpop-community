@@ -66,13 +66,7 @@ export async function GET(request: Request) {
             if (anyProfile) author_id = anyProfile.id
         }
 
-        // If not found (admin hasn't logged in yet?), pick ANY user
-        if (!author) {
-            const { data: anyUser } = await supabase.from('profiles').select('id').limit(1).single()
-            author = anyUser
-        }
-
-        if (!author) {
+        if (!author_id) {
             console.error('ERROR: No user found to act as bot')
             return NextResponse.json({ error: 'No user found to act as bot' }, { status: 500 })
         }

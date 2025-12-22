@@ -48,15 +48,22 @@ export async function GET(request: Request) {
             return NextResponse.json({ message: 'Article already exists, skipping.', title: result.title })
         }
 
-        // Find a user to act as the Author
-        // Ideally: 'jundae54@gmail.com' (The Admin) or any random user if admin not found
+        // Find a user to act as the Author (Admin)
         const ADMIN_EMAIL = 'jundae54@gmail.com'
+        let author_id: string | null = null
 
-        // Try to find admin profile first
-        let { data: author, error: profileError } = await supabase.from('profiles').select('id').eq('email', ADMIN_EMAIL).single()
+        // 1. Try to find user ID from Auth (Admin API)
+        const { data: { users }, error: userError } = await supabase.auth.admin.listUsers()
 
-        if (profileError) {
-            console.log("Admin profile fetch failed or empty", profileError)
+        if (users) {
+            const adminUser = users.find(u => u.email === ADMIN_EMAIL)
+            if (adminUser) author_id = adminUser.id
+        }
+
+        // 2. If not found, pick FIRST profile as fallback
+        if (!author_id) {
+            const { data: anyProfile } = await supabase.from('profiles').select('id').limit(1).single()
+            if (anyProfile) author_id = anyProfile.id
         }
 
         // If not found (admin hasn't logged in yet?), pick ANY user
@@ -74,7 +81,7 @@ export async function GET(request: Request) {
             title: result.title,
             content: result.content,
             image_url: result.image_url,
-            author_id: author.id,
+            author_id: author_id,
             // We could look up a 'News' group ID here if we had one
         }).select()
 

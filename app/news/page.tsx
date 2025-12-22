@@ -59,7 +59,7 @@ function PostCard({ post }: { post: Post }) {
                             K-Community Bot
                         </p>
                         <p className="text-xs text-zinc-500">
-                            {new Date(post.created_at).toLocaleDateString()}
+                            {new Date(post.created_at).toLocaleDateString('pt-BR')}
                         </p>
                     </div>
                 </div>

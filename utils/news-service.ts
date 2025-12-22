@@ -51,7 +51,8 @@ export async function scrapeArticle(url: string): Promise<{ title: string; conte
             content = $('p').text().substring(0, 3000)
         }
 
-        const image = $('meta[property="og:image"]').attr('content') || $('img').first().attr('src')
+        // Disable image scraping to avoid copyright issues
+        const image = undefined // $('meta[property="og:image"]').attr('content') || $('img').first().attr('src')
 
         if (!title || content.length < 50) {
             console.log('Skipping: Missing title or meaningful content', url)

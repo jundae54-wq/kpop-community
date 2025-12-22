@@ -6,14 +6,11 @@ export async function middleware(request: NextRequest) {
     const response = await updateSession(request)
 
     // 2. Localization Logic
-    // Default to 'en'
-    let locale = 'en'
+    // Force 'pt' for everyone as per user request
+    let locale = 'pt'
 
-    // Check Vercel Country Header (BR = Brazil)
-    const country = request.headers.get('x-vercel-ip-country')
-    if (country === 'BR') {
-        locale = 'pt'
-    }
+    // (Previously detected based on header, now disabled)
+    // const country = request.headers.get('x-vercel-ip-country')
 
     // Set header for server components to read
     response.headers.set('x-locale', locale)

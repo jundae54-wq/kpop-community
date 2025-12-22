@@ -21,23 +21,23 @@ export default async function WritePage() {
 
     return (
         <div className="mx-auto max-w-xl py-8 sm:py-12 px-4">
-            <h1 className="text-2xl font-bold text-white mb-6">Write a Post</h1>
+            <h1 className="text-2xl font-bold text-white mb-6">Escrever Post</h1>
 
             <form action={createPost} className="space-y-6">
                 <div>
-                    <label htmlFor="title" className="block text-sm font-medium text-zinc-300 mb-2">Title</label>
+                    <label htmlFor="title" className="block text-sm font-medium text-zinc-300 mb-2">Título</label>
                     <input
                         type="text"
                         name="title"
                         id="title"
                         required
                         className="w-full rounded-lg border border-white/10 bg-zinc-900 p-4 text-white placeholder-zinc-500 focus:border-brand focus:ring-1 focus:ring-brand transition-colors outline-none"
-                        placeholder="What's happening in K-Pop?"
+                        placeholder="O que está acontecendo no K-Pop?"
                     />
                 </div>
 
                 <div>
-                    <label htmlFor="groupId" className="block text-sm font-medium text-zinc-300 mb-2">Category</label>
+                    <label htmlFor="groupId" className="block text-sm font-medium text-zinc-300 mb-2">Categoria</label>
                     <div className="relative">
                         <select
                             name="groupId"
@@ -46,9 +46,9 @@ export default async function WritePage() {
                             className="w-full appearance-none rounded-xl border border-input bg-zinc-900 p-4 text-white focus:border-brand focus:ring-1 focus:ring-brand transition-all outline-none invalid:text-zinc-500 hover:border-zinc-700"
                             defaultValue=""
                         >
-                            <option value="" disabled className="bg-zinc-900 text-zinc-500">Select a category</option>
+                            <option value="" disabled className="bg-zinc-900 text-zinc-500">Selecione uma categoria</option>
                             {idols.length > 0 && (
-                                <optgroup label="Idols" className="bg-zinc-900 text-zinc-400 font-bold">
+                                <optgroup label="Ídolos" className="bg-zinc-900 text-zinc-400 font-bold">
                                     {idols.map((group) => (
                                         <option key={group.id} value={group.id} className="bg-zinc-900 text-white font-normal py-1">
                                             {group.name}
@@ -57,7 +57,7 @@ export default async function WritePage() {
                                 </optgroup>
                             )}
                             {actors.length > 0 && (
-                                <optgroup label="Actors" className="bg-zinc-900 text-zinc-400 font-bold">
+                                <optgroup label="Atores" className="bg-zinc-900 text-zinc-400 font-bold">
                                     {actors.map((group) => (
                                         <option key={group.id} value={group.id} className="bg-zinc-900 text-white font-normal py-1">
                                             {group.name}
@@ -73,13 +73,13 @@ export default async function WritePage() {
                 </div>
 
                 <div>
-                    <label htmlFor="content" className="block text-sm font-medium text-zinc-300 mb-2">Content</label>
+                    <label htmlFor="content" className="block text-sm font-medium text-zinc-300 mb-2">Conteúdo</label>
                     <textarea
                         name="content"
                         id="content"
                         rows={6}
                         className="w-full rounded-lg border border-white/10 bg-zinc-900 p-4 text-white placeholder-zinc-500 focus:border-brand focus:ring-1 focus:ring-brand transition-colors outline-none resize-none"
-                        placeholder="Share your thoughts..."
+                        placeholder="Compartilhe seus pensamentos..."
                     />
                 </div>
 
@@ -88,7 +88,7 @@ export default async function WritePage() {
                         type="submit"
                         className="rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:bg-brand/90 transition-all"
                     >
-                        Publish Post
+                        Publicar Post
                     </button>
                 </div>
             </form>

@@ -25,8 +25,8 @@ export default async function NewsPage() {
         <div className="mx-auto max-w-2xl py-8 px-4">
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-white">Latest K-News</h1>
-                <p className="mt-1 text-zinc-300">Daily automated news updates.</p>
+                <h1 className="text-3xl font-bold tracking-tight text-white">Últimas Notícias K-Pop</h1>
+                <p className="mt-1 text-zinc-300">Atualizações diárias automáticas.</p>
             </div>
 
             {/* Feed */}
@@ -91,9 +91,9 @@ function EmptyState() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
-            <h3 className="text-lg font-semibold text-white">No news yet</h3>
+            <h3 className="text-lg font-semibold text-white">Nenhuma notícia ainda</h3>
             <p className="text-sm text-zinc-500 max-w-xs mx-auto mt-2">
-                Waiting for the daily cycle.
+                Aguardando o ciclo diário.
             </p>
         </div>
     )

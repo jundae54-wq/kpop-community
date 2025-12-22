@@ -57,13 +57,13 @@ export default async function CommunityPage(props: {
             {/* 1. Daily Best */}
             <div className="mb-10">
                 <h2 className="text-lg font-bold text-brand mb-4 flex items-center gap-2">
-                    🔥 Daily Best
+                    🔥 Destaques do Dia
                 </h2>
                 {trendingPost ? (
                     <PostCard post={trendingPost} highlight />
                 ) : (
                     <div className="rounded-xl border border-white/5 bg-zinc-900/30 p-6 text-center text-zinc-500 text-sm">
-                        No trending posts yet today.
+                        Nenhum destaque hoje ainda.
                     </div>
                 )}
             </div>
@@ -76,7 +76,7 @@ export default async function CommunityPage(props: {
                 >
                     <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-gradient-to-br from-brand to-purple-600`} />
                     <span className="text-3xl mb-1">🎤</span>
-                    <span className={`text-lg font-bold tracking-wide ${type === 'idol' ? 'text-brand' : 'text-zinc-400 group-hover:text-white'}`}>IDOLS</span>
+                    <span className={`text-lg font-bold tracking-wide ${type === 'idol' ? 'text-brand' : 'text-zinc-400 group-hover:text-white'}`}>ÍDOLOS</span>
                 </Link>
                 <Link
                     href="/community?type=actor"
@@ -84,7 +84,7 @@ export default async function CommunityPage(props: {
                 >
                     <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-gradient-to-br from-blue-500 to-cyan-500`} />
                     <span className="text-3xl mb-1">🎬</span>
-                    <span className={`text-lg font-bold tracking-wide ${type === 'actor' ? 'text-brand' : 'text-zinc-400 group-hover:text-white'}`}>ACTORS</span>
+                    <span className={`text-lg font-bold tracking-wide ${type === 'actor' ? 'text-brand' : 'text-zinc-400 group-hover:text-white'}`}>ATORES</span>
                 </Link>
             </div>
 
@@ -99,7 +99,7 @@ export default async function CommunityPage(props: {
                                 : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'
                                 }`}
                         >
-                            All {type === 'idol' ? 'Idols' : 'Actors'}
+                            Todos {type === 'idol' ? 'Ídolos' : 'Atores'}
                         </Link>
                         {visibleGroups.map((group) => (
                             <Link
@@ -119,7 +119,7 @@ export default async function CommunityPage(props: {
 
             {/* 4. Feed */}
             <h3 className="text-white font-bold mb-4">
-                {categoryId ? 'Group Posts' : type ? `${type === 'idol' ? 'Idol' : 'Actor'} Posts` : 'Recent Posts'}
+                {categoryId ? 'Posts do Grupo' : type ? `Posts de ${type === 'idol' ? 'Ídolos' : 'Atores'}` : 'Posts Recentes'}
             </h3>
             <div className="space-y-6">
                 {(!filteredPosts || filteredPosts.length === 0) ? (
@@ -151,7 +151,7 @@ function PostCard({ post, highlight = false }: { post: Post, highlight?: boolean
                     </div>
                     <div>
                         <p className="text-sm font-medium text-white">
-                            {post.author?.full_name || 'Anonymous'}
+                            {post.author?.full_name || 'Anônimo'}
                         </p>
                         <p className="text-xs text-zinc-500">
                             {new Date(post.created_at).toLocaleDateString()}
@@ -174,9 +174,9 @@ function PostCard({ post, highlight = false }: { post: Post, highlight?: boolean
 
                 {highlight && (
                     <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
-                        <span>🔥 Trending</span>
+                        <span>🔥 Em Alta</span>
                         <span>•</span>
-                        <span>{post.views || 0} views</span>
+                        <span>{post.views || 0} visualizações</span>
                     </div>
                 )}
 
@@ -199,9 +199,9 @@ function EmptyState() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
-            <h3 className="text-lg font-semibold text-white">No community posts yet</h3>
+            <h3 className="text-lg font-semibold text-white">Nenhum post ainda</h3>
             <p className="text-sm text-zinc-500 max-w-xs mx-auto mt-2">
-                Be the first fan to start a discussion!
+                Seja o primeiro fã a começar uma discussão!
             </p>
         </div>
     )

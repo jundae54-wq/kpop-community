@@ -51,7 +51,7 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
                     onClick={() => setIsEditing(true)}
                     className="px-4 py-2 rounded-full bg-white/5 text-sm font-medium text-white hover:bg-white/10 transition-colors"
                 >
-                    Edit Profile
+                    Editar Perfil
                 </button>
             </div>
         )
@@ -62,7 +62,7 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
             await updateProfile(formData)
             setIsEditing(false)
         }} className="mb-8 rounded-2xl bg-zinc-900/50 p-6 border border-brand/50 backdrop-blur-xl animate-in fade-in slide-in-from-top-2">
-            <h2 className="text-lg font-bold text-white mb-6">Edit Profile</h2>
+            <h2 className="text-lg font-bold text-white mb-6">Editar Perfil</h2>
 
             <div className="flex flex-col sm:flex-row gap-8">
                 {/* Avatar Section */}
@@ -91,7 +91,7 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
                             className="px-3 py-1.5 rounded-full bg-blue-500/10 text-xs font-medium text-blue-400 hover:bg-blue-500/20 transition-colors disabled:opacity-50"
                             disabled={isLoadingAvatar}
                         >
-                            🎲 Boy
+                            🎲 Garoto
                         </button>
                         <button
                             type="button"
@@ -99,7 +99,7 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
                             className="px-3 py-1.5 rounded-full bg-pink-500/10 text-xs font-medium text-pink-400 hover:bg-pink-500/20 transition-colors disabled:opacity-50"
                             disabled={isLoadingAvatar}
                         >
-                            🎲 Girl
+                            🎲 Garota
                         </button>
                     </div>
                 </div>
@@ -107,12 +107,12 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
                 {/* Inputs */}
                 <div className="flex-1 space-y-4">
                     <div>
-                        <label htmlFor="fullName" className="block text-sm font-medium text-zinc-400 mb-1">Display Name</label>
+                        <label htmlFor="fullName" className="block text-sm font-medium text-zinc-400 mb-1">Nome de Exibição</label>
                         <input
                             type="text"
                             name="fullName"
                             defaultValue={user.full_name || ''}
-                            placeholder="Enter your nickname"
+                            placeholder="Digite seu apelido"
                             className="w-full rounded-lg bg-zinc-950 border border-white/10 p-3 text-white focus:border-brand focus:ring-1 focus:ring-brand outline-none"
                         />
                     </div>
@@ -123,7 +123,7 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
                             type="submit"
                             className="rounded-full bg-brand px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-brand/20 hover:bg-brand/90 transition-all"
                         >
-                            Save Changes
+                            Salvar Alterações
                         </button>
                         <button
                             type="button"
@@ -133,7 +133,7 @@ export default function ProfileEditor({ user }: ProfileEditorProps) {
                             }}
                             className="rounded-full px-6 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors"
                         >
-                            Cancel
+                            Cancelar
                         </button>
                     </div>
                 </div>

@@ -92,12 +92,12 @@ export default async function PostPage({ params }: Props) {
                     {post.content}
                 </div>
 
-                {post.image_url && (
+                {/* Image hidden for copyright safety */}
+                {/* {post.image_url && (
                     <div className="mt-8 rounded-xl overflow-hidden">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={post.image_url} alt="" className="w-full object-cover" />
                     </div>
-                )}
+                )} */}
             </article>
 
             {/* Comments Section */}

@@ -72,12 +72,12 @@ function PostCard({ post }: { post: Post }) {
                     {post.content}
                 </p>
 
-                {post.image_url && (
+                {/* Image hidden for copyright safety */}
+                {/* {post.image_url && (
                     <div className="mt-4 overflow-hidden rounded-lg">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={post.image_url} alt="" className="h-48 w-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
                     </div>
-                )}
+                )} */}
             </article>
         </Link>
     )

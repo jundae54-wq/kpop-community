@@ -119,8 +119,11 @@ Task:
 1. Translate the English title to Portuguese.
 2. Read the English article and write a **summary in Portuguese** (about 2-3 paragraphs).
 3. Do NOT simply translate word-for-word. Summarize the key facts to avoid copyright issues.
-4. Tone: Exciting, engaging, suitable for a community.
-5. Return strictly JSON format: { "title": "...", "content": "..." }`
+4. **Identify the Main Entity**: Find the single most relevant K-Pop Group or Actor discussed.
+   - If it's a general topic or about many groups, return null.
+   - If it's a specific idol/group or actor, return their name and type ('idol' or 'actor').
+5. Tone: Exciting, engaging, suitable for a community.
+6. Return strictly JSON format: { "title": "...", "content": "...", "related_artist": "Name" | null, "artist_type": "idol" | "actor" | null }`
                     },
                     { role: "user", content: `TITLE: ${raw.title}\n\nCONTENT: ${raw.content.substring(0, 2500)}` }
                 ],
@@ -131,6 +134,14 @@ Task:
             const result = JSON.parse(completion.choices[0].message.content || '{}')
             summaryPt = result.content || "Resumo indisponível."
             translatedTitle = result.title || raw.title
+
+            return {
+                title: translatedTitle,
+                content: `${summaryPt}\n\nSource: [Soompi](${url})`,
+                image_url: raw.image,
+                related_artist: result.related_artist || null,
+                artist_type: result.artist_type || null
+            }
         } catch (e) {
             console.error('OpenAI Error:', e)
             summaryPt = "Erro ao gerar resumo."
@@ -144,6 +155,8 @@ Task:
     return {
         title: translatedTitle,
         content: `${summaryPt}\n\nSource: [Soompi](${url})`,
-        image_url: raw.image
+        image_url: raw.image,
+        related_artist: null,
+        artist_type: null
     }
 }

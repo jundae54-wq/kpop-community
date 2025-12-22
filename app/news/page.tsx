@@ -48,16 +48,29 @@ function PostCard({ post }: { post: Post }) {
         <Link href={`/p/${post.id}`} className="block group">
             <article className="rounded-xl border border-white/10 bg-zinc-900/50 p-5 transition-all hover:bg-zinc-800/50 hover:border-brand/30">
                 <div className="flex items-center gap-3 mb-3">
-                    <div className="h-8 w-8 rounded-full bg-zinc-700 overflow-hidden">
+                    <div className="h-8 w-8 rounded-full bg-zinc-700 overflow-hidden flex-shrink-0">
                         {/* News usually has no user avatar, or bot avatar */}
-                        <div className="h-full w-full flex items-center justify-center text-xs font-bold text-zinc-400 bg-brand/20 text-brand">
-                            N
-                        </div>
+                        {post.group ? (
+                            <div className="h-full w-full flex items-center justify-center text-xs font-bold text-white bg-brand">
+                                {post.group.name.substring(0, 1)}
+                            </div>
+                        ) : (
+                            <div className="h-full w-full flex items-center justify-center text-xs font-bold text-zinc-400 bg-brand/20 text-brand">
+                                N
+                            </div>
+                        )}
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-white">
-                            K-Community Bot
-                        </p>
+                        <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-white">
+                                {post.group ? post.group.name : 'K-Community Bot'}
+                            </p>
+                            {post.group && (
+                                <span className="text-[10px] bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded border border-zinc-700">
+                                    {post.group.type === 'idol' ? 'Idol' : 'Actor'}
+                                </span>
+                            )}
+                        </div>
                         <p className="text-xs text-zinc-500">
                             {new Date(post.created_at).toLocaleDateString('pt-BR')}
                         </p>

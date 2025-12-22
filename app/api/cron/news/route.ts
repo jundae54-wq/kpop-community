@@ -71,12 +71,51 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'No user found to act as bot' }, { status: 500 })
         }
 
+        // Logic: Find or Create Group
+        let group_id: number | null = null
+        if (result.related_artist) {
+            const normalizedName = result.related_artist.toLowerCase().trim()
+
+            // 1. Check existing
+            const { data: existingGroup } = await supabase
+                .from('groups')
+                .select('id')
+                .ilike('name', result.related_artist) // case insensitive match
+                .maybeSingle()
+
+            if (existingGroup) {
+                group_id = existingGroup.id
+            } else {
+                // 2. Create new
+                // Only create if we have a valid type ('idol' or 'actor'), default to 'idol' if unsure but confident name
+                const type = (result.artist_type === 'idol' || result.artist_type === 'actor') ? result.artist_type : 'idol'
+
+                const { data: newGroup, error: groupError } = await supabase
+                    .from('groups')
+                    .insert({
+                        name: result.related_artist,
+                        slug: result.related_artist.toLowerCase().replace(/\s+/g, '-'),
+                        type: type,
+                        image_url: null // Can be filled later or by another valid image source
+                    })
+                    .select()
+                    .single()
+
+                if (newGroup) {
+                    console.log(`Auto-created new category: ${newGroup.name}`)
+                    group_id = newGroup.id
+                } else if (groupError) {
+                    console.error('Failed to create group:', groupError)
+                }
+            }
+        }
+
         const { data, error } = await supabase.from('posts').insert({
             title: result.title,
             content: result.content,
             image_url: result.image_url,
             author_id: author_id,
-            // We could look up a 'News' group ID here if we had one
+            group_id: group_id
         }).select()
 
         if (error) {

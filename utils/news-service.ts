@@ -14,46 +14,47 @@ export interface NewsItem {
     imageUrl?: string
 }
 
-export async function scrapeNaverEnt(url: string): Promise<{ title: string; content: string; image?: string } | null> {
+// Scrape Soompi Article
+export async function scrapeArticle(url: string): Promise<{ title: string; content: string; image?: string } | null> {
     try {
         const response = await fetch(url, {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             }
         })
 
-        if (!response.ok) return null
+        if (!response.ok) {
+            console.log('Fetch failed:', response.status)
+            return null
+        }
 
         const html = await response.text()
         const $ = cheerio.load(html)
 
-        // 1. Clean up script/style tags
+        // Soompi Selectors
+        const title = $('h1').first().text().trim() || $('title').text().trim()
+
+        // Remove ads and unnecessary elements
         $('script').remove()
         $('style').remove()
+        $('.ad-container').remove()
 
-        // 2. Extract Title (Try multiple common selectors)
-        const title =
-            $('h2.end_tit').first().text().trim() ||
-            $('.media_end_head_headline').text().trim() ||
-            $('h2.heading').text().trim() ||
-            $('title').text().trim()
+        // Content: P tags inside article body
+        // Soompi usually puts content in a wrapper, let's grab all paragraphs
+        let content = ''
+        $('article p').each((_, el) => {
+            content += $(el).text().trim() + '\n\n'
+        })
 
-        // 3. Extract Content
-        const content =
-            $('#articeBody').text().trim() ||
-            $('#dic_area').text().trim() ||
-            $('.go_trans').text().trim() ||
-            $('.news_end').text().trim()
+        // Fallback content selector
+        if (!content) {
+            content = $('p').text().substring(0, 3000)
+        }
 
-        // 4. Extract Image (High res preferred)
-        let image =
-            $('img#img1').attr('data-src') ||
-            $('img#img1').attr('src') ||
-            $('.media_end_head_photo_img').attr('src') ||
-            $('meta[property="og:image"]').attr('content')
+        const image = $('meta[property="og:image"]').attr('content') || $('img').first().attr('src')
 
-        if (!title || !content) {
-            console.log('Skipping: Missing title or content', url)
+        if (!title || content.length < 50) {
+            console.log('Skipping: Missing title or meaningful content', url)
             return null
         }
 
@@ -66,47 +67,40 @@ export async function scrapeNaverEnt(url: string): Promise<{ title: string; cont
 
 export async function findLatestArticleUrl(listingUrl: string): Promise<string | null> {
     try {
-        const response = await fetch(listingUrl, {
+        // Use Soompi RSS Feed (Most reliable)
+        const targetListingUrl = 'https://www.soompi.com/feed'
+
+        const response = await fetch(targetListingUrl, {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             }
         })
-        if (!response.ok) return null
+        if (!response.ok) {
+            console.log('RSS Fetch failed:', response.status)
+            return null
+        }
 
-        const html = await response.text()
-        const $ = cheerio.load(html)
+        const xml = await response.text()
+        const $ = cheerio.load(xml, { xmlMode: true })
 
-        let foundUrl: string | null = null
+        // Find first item link
+        const firstLink = $('item > link').first().text()
 
-        // Naver Ranking Listing (Mobile) often uses these classes
-        // Look for the first link that is a valid article
-        $('a').each((_, el) => {
-            if (foundUrl) return
-            const href = $(el).attr('href')
-            // Filter for article links (usually contains /article/ or /read/)
-            if (href && (href.includes('/article/') || href.includes('/read/'))) {
-                // Ignore "ranking" self-links
-                if (href.includes('ranking')) return
+        if (firstLink) {
+            return firstLink.trim()
+        }
 
-                if (href.startsWith('http')) {
-                    foundUrl = href
-                } else {
-                    foundUrl = `https://m.entertain.naver.com${href}`
-                }
-            }
-        })
-
-        return foundUrl
+        return null
 
     } catch (e) {
-        console.error('Failed to find article:', e)
+        console.error('Failed to find article from RSS:', e)
         return null
     }
 }
 
 export async function processNewsArticle(url: string) {
     // 1. Scrape
-    const raw = await scrapeNaverEnt(url)
+    const raw = await scrapeArticle(url)
     if (!raw) return null
 
     // 2. Summarize & Translate via AI
@@ -121,13 +115,13 @@ export async function processNewsArticle(url: string) {
                         role: "system",
                         content: `You are a professional K-Pop news editor for Brazilian fans.
 Task:
-1. Translate the title to Portuguese.
-2. Read the Korean article and write a **summary in Portuguese** (about 2-3 paragraphs).
+1. Translate the English title to Portuguese.
+2. Read the English article and write a **summary in Portuguese** (about 2-3 paragraphs).
 3. Do NOT simply translate word-for-word. Summarize the key facts to avoid copyright issues.
 4. Tone: Exciting, engaging, suitable for a community.
 5. Return strictly JSON format: { "title": "...", "content": "..." }`
                     },
-                    { role: "user", content: `TITLE: ${raw.title}\n\nCONTENT: ${raw.content.substring(0, 2000)}` }
+                    { role: "user", content: `TITLE: ${raw.title}\n\nCONTENT: ${raw.content.substring(0, 2500)}` }
                 ],
                 model: "gpt-4o-mini",
                 response_format: { type: "json_object" }
@@ -142,13 +136,13 @@ Task:
             translatedTitle = raw.title
         }
     } else {
-        summaryPt = "⚠️ OpenAI API Key missing. Please configure it in Vercel.\n\nRaw Content (KR): " + raw.content.substring(0, 100) + "..."
+        summaryPt = "⚠️ OpenAI API Key missing. Please configure it in Vercel.\n\nRaw Content (EN): " + raw.content.substring(0, 100) + "..."
         translatedTitle = raw.title
     }
 
     return {
         title: translatedTitle,
-        content: `${summaryPt}\n\nSource: [Naver News](${url})`,
+        content: `${summaryPt}\n\nSource: [Soompi](${url})`,
         image_url: raw.image
     }
 }

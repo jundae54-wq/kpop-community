@@ -12,19 +12,24 @@ export async function GET(request: Request) {
     }
 
     // 1. Define sources
-    const listingUrl = 'https://m.entertain.naver.com/ranking/article'
+    const listingUrl = 'https://www.soompi.com/feed'
 
     // 2. Discover Latest Article
+    console.log('Finding latest article from:', listingUrl)
     let targetUrl = await findLatestArticleUrl(listingUrl)
+    console.log('Target URL found:', targetUrl)
 
     if (!targetUrl) {
+        console.error('ERROR: No target URL found')
         return NextResponse.json({ error: 'Failed to discover new article source' }, { status: 500 })
     }
 
     // 3. Process (Scrape + AI)
+    console.log('Processing article...')
     const result = await processNewsArticle(targetUrl)
 
     if (!result) {
+        console.error('ERROR: Result process failed')
         return NextResponse.json({ error: 'Failed to process news' }, { status: 500 })
     }
 

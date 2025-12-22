@@ -2,6 +2,8 @@ import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { Post } from '@/types/database'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewsPage() {
     const supabase = await createClient()
 

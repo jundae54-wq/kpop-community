@@ -74,6 +74,7 @@ export async function GET(request: Request) {
         // Logic: Find or Create Group
         let group_id: number | null = null
         if (result.related_artist) {
+            console.log('AI identified artist:', result.related_artist, 'Type:', result.artist_type)
             const normalizedName = result.related_artist.toLowerCase().trim()
 
             // 1. Check existing
@@ -84,9 +85,11 @@ export async function GET(request: Request) {
                 .maybeSingle()
 
             if (existingGroup) {
+                console.log('Found existing group:', existingGroup.id)
                 group_id = existingGroup.id
             } else {
                 // 2. Create new
+                console.log('No existing group found, creating new...')
                 // Only create if we have a valid type ('idol' or 'actor'), default to 'idol' if unsure but confident name
                 const type = (result.artist_type === 'idol' || result.artist_type === 'actor') ? result.artist_type : 'idol'
 
@@ -102,31 +105,32 @@ export async function GET(request: Request) {
                     .single()
 
                 if (newGroup) {
-                    console.log(`Auto-created new category: ${newGroup.name}`)
+                    console.log(`✅ Auto-created new category: ${newGroup.name} (ID: ${newGroup.id})`)
                     group_id = newGroup.id
                 } else if (groupError) {
-                    console.error('Failed to create group:', groupError)
+                    console.error('❌ Failed to create group:', groupError)
                 }
             }
+        } else {
+            console.log('No specific artist identified by AI for this article')
+
+            const { data, error } = await supabase.from('posts').insert({
+                title: result.title,
+                content: result.content,
+                image_url: result.image_url,
+                author_id: author_id,
+                group_id: group_id
+            }).select()
+
+            if (error) {
+                console.error('Supabase Insert Error:', error)
+                return NextResponse.json({ error: error.message }, { status: 500 })
+            }
+
+            return NextResponse.json({ success: true, post: data })
+
+        } catch (e: any) {
+            console.error('CRITICAL CRON ERROR:', e)
+            return NextResponse.json({ error: e.message || 'Unknown Server Error' }, { status: 500 })
         }
-
-        const { data, error } = await supabase.from('posts').insert({
-            title: result.title,
-            content: result.content,
-            image_url: result.image_url,
-            author_id: author_id,
-            group_id: group_id
-        }).select()
-
-        if (error) {
-            console.error('Supabase Insert Error:', error)
-            return NextResponse.json({ error: error.message }, { status: 500 })
-        }
-
-        return NextResponse.json({ success: true, post: data })
-
-    } catch (e: any) {
-        console.error('CRITICAL CRON ERROR:', e)
-        return NextResponse.json({ error: e.message || 'Unknown Server Error' }, { status: 500 })
     }
-}

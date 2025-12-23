@@ -83,7 +83,7 @@ export default async function PostPage({ params }: Props) {
                         </div>
                         <div>
                             <p className="text-white font-medium">{post.author?.full_name || 'Anonymous'}</p>
-                            <p className="text-zinc-500 text-sm">Author</p>
+                            <p className="text-zinc-500 text-sm">Autor</p>
                         </div>
                     </div>
                 </header>
@@ -102,7 +102,7 @@ export default async function PostPage({ params }: Props) {
 
             {/* Comments Section */}
             <section className="border-t border-white/10 pt-10">
-                <h3 className="text-2xl font-bold text-white mb-8">Comments ({comments?.length || 0})</h3>
+                <h3 className="text-2xl font-bold text-white mb-8">Comentários ({comments?.length || 0})</h3>
 
                 {/* Comment List */}
                 <div className="space-y-6 mb-10">
@@ -140,19 +140,19 @@ export default async function PostPage({ params }: Props) {
                             <textarea
                                 name="content"
                                 required
-                                placeholder="Write a comment..."
+                                placeholder="Escreva um comentário..."
                                 rows={2}
                                 className="w-full rounded-lg border-0 bg-zinc-900 p-3 text-white placeholder-zinc-500 focus:ring-2 focus:ring-brand mb-2"
                             />
                             <button type="submit" className="text-sm font-semibold text-brand hover:text-brand/80 transition-colors">
-                                Post Comment
+                                Publicar Comentário
                             </button>
                         </div>
                     </form>
                 ) : (
                     <div className="rounded-lg bg-zinc-900/50 p-6 text-center">
-                        <p className="text-zinc-400 mb-2">Log in to join the conversation</p>
-                        <a href="/login" className="text-brand font-semibold hover:underline">Sign In</a>
+                        <p className="text-zinc-400 mb-2">Faça login para participar da conversa</p>
+                        <a href="/login" className="text-brand font-semibold hover:underline">Entrar</a>
                     </div>
                 )}
             </section>

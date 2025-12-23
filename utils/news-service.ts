@@ -107,6 +107,8 @@ export async function processNewsArticle(url: string) {
     // 2. Summarize & Translate via AI
     let summaryPt = ''
     let translatedTitle = ''
+    let related_artist: string | null = null
+    let artist_type: 'idol' | 'actor' | null = null
 
     if (openai) {
         try {
@@ -134,14 +136,8 @@ Task:
             const result = JSON.parse(completion.choices[0].message.content || '{}')
             summaryPt = result.content || "Resumo indisponível."
             translatedTitle = result.title || raw.title
-
-            return {
-                title: translatedTitle,
-                content: `${summaryPt}\n\nSource: [Soompi](${url})`,
-                image_url: raw.image,
-                related_artist: result.related_artist || null,
-                artist_type: result.artist_type || null
-            }
+            related_artist = result.related_artist || null
+            artist_type = result.artist_type || null
         } catch (e) {
             console.error('OpenAI Error:', e)
             summaryPt = "Erro ao gerar resumo."
@@ -156,7 +152,7 @@ Task:
         title: translatedTitle,
         content: `${summaryPt}\n\nSource: [Soompi](${url})`,
         image_url: raw.image,
-        related_artist: null,
-        artist_type: null
+        related_artist,
+        artist_type
     }
 }

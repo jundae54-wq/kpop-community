@@ -64,15 +64,20 @@ export default async function PostPage({ params }: Props) {
             {/* Post Content */}
             <article className="mb-8 sm:mb-12">
                 <header className="mb-6">
-                    <div className="flex items-center gap-2 text-xs sm:text-sm text-zinc-400 mb-3 sm:mb-4">
+                    <div className="flex items-center gap-2 mb-3 sm:mb-4">
                         {post.group && <span className="text-brand font-medium">#{post.group.name}</span>}
+                        {!post.group && <span className="text-brand font-medium">📰 Notícia</span>}
                         <span>•</span>
                         <span>{new Date(post.created_at).toLocaleDateString()}</span>
                     </div>
                     <h1 className="text-2xl sm:text-4xl font-bold text-white mb-4 leading-tight">{post.title}</h1>
                     <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-zinc-700 overflow-hidden">
-                            {post.author?.avatar_url ? (
+                            {!post.group ? (
+                                <div className="h-full w-full flex items-center justify-center text-xs font-bold text-brand bg-brand/20">
+                                    N
+                                </div>
+                            ) : post.author?.avatar_url ? (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img src={post.author.avatar_url} alt="" className="h-full w-full object-cover" />
                             ) : (
@@ -82,7 +87,7 @@ export default async function PostPage({ params }: Props) {
                             )}
                         </div>
                         <div>
-                            <p className="text-white font-medium">{post.author?.full_name || 'Anonymous'}</p>
+                            <p className="text-white font-medium">{!post.group ? 'K-Community Bot' : (post.author?.full_name || 'Anônimo')}</p>
                             <p className="text-zinc-500 text-sm">Autor</p>
                         </div>
                     </div>

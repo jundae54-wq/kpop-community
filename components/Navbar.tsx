@@ -18,9 +18,8 @@ export default async function Navbar() {
         <nav className="sticky top-0 z-50 w-full border-b border-white/5 bg-background/80 backdrop-blur-md">
             <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
                 <Link href="/" className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-white font-bold shadow-lg shadow-brand/20">
-                        K
-                    </div>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/icon-192.png" alt="K-Community" className="h-8 w-8 rounded-lg" />
                     <span className="text-xl font-bold tracking-tight text-foreground hidden sm:inline-block">Community</span>
                 </Link>
 

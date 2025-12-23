@@ -113,24 +113,25 @@ export async function GET(request: Request) {
             }
         } else {
             console.log('No specific artist identified by AI for this article')
-
-            const { data, error } = await supabase.from('posts').insert({
-                title: result.title,
-                content: result.content,
-                image_url: result.image_url,
-                author_id: author_id,
-                group_id: group_id
-            }).select()
-
-            if (error) {
-                console.error('Supabase Insert Error:', error)
-                return NextResponse.json({ error: error.message }, { status: 500 })
-            }
-
-            return NextResponse.json({ success: true, post: data })
-
-        } catch (e: any) {
-            console.error('CRITICAL CRON ERROR:', e)
-            return NextResponse.json({ error: e.message || 'Unknown Server Error' }, { status: 500 })
         }
+
+        const { data, error } = await supabase.from('posts').insert({
+            title: result.title,
+            content: result.content,
+            image_url: result.image_url,
+            author_id: author_id,
+            group_id: group_id
+        }).select()
+
+        if (error) {
+            console.error('Supabase Insert Error:', error)
+            return NextResponse.json({ error: error.message }, { status: 500 })
+        }
+
+        return NextResponse.json({ success: true, post: data })
+
+    } catch (e: any) {
+        console.error('CRITICAL CRON ERROR:', e)
+        return NextResponse.json({ error: e.message || 'Unknown Server Error' }, { status: 500 })
     }
+}

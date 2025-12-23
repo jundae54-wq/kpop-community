@@ -172,3 +172,49 @@ export async function updateProfile(formData: FormData) {
     revalidatePath('/profile')
     revalidatePath('/') // Update navbar avatar
 }
+
+export async function requestPasswordReset(formData: FormData) {
+    const supabase = await createClient()
+    const email = formData.get('email') as string
+
+    const origin = process.env.NEXT_PUBLIC_SITE_URL ||
+        process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
+        (await headers()).get('origin') || 'http://localhost:3000'
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${origin}/update-password`,
+    })
+
+    if (error) {
+        console.error('Password reset error:', error)
+        redirect('/reset-password?error=' + encodeURIComponent('Falha ao enviar email. Verifique o endereço.'))
+    }
+
+    redirect('/reset-password?message=' + encodeURIComponent('Email enviado! Verifique sua caixa de entrada.'))
+}
+
+export async function updatePassword(formData: FormData) {
+    const supabase = await createClient()
+    const password = formData.get('password') as string
+    const confirmPassword = formData.get('confirmPassword') as string
+
+    if (password !== confirmPassword) {
+        redirect('/update-password?error=' + encodeURIComponent('As senhas não coincidem'))
+    }
+
+    if (password.length < 6) {
+        redirect('/update-password?error=' + encodeURIComponent('A senha deve ter pelo menos 6 caracteres'))
+    }
+
+    const { error } = await supabase.auth.updateUser({
+        password: password
+    })
+
+    if (error) {
+        console.error('Password update error:', error)
+        redirect('/update-password?error=' + encodeURIComponent('Falha ao atualizar senha'))
+    }
+
+    revalidatePath('/', 'layout')
+    redirect('/login?message=' + encodeURIComponent('Senha atualizada com sucesso! Faça login.'))
+}

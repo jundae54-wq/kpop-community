@@ -69,11 +69,16 @@ export default async function LoginPage(props: {
                         </button>
                     </div>
 
-                    <div className="text-center text-sm">
-                        <span className="text-zinc-400">Não tem uma conta? </span>
-                        <Link href="/signup" className="font-semibold text-brand hover:text-brand/80">
-                            Cadastre-se
+                    <div className="flex items-center justify-between text-sm">
+                        <Link href="/reset-password" className="text-zinc-400 hover:text-brand transition-colors">
+                            Esqueceu a senha?
                         </Link>
+                        <div>
+                            <span className="text-zinc-400">Não tem uma conta? </span>
+                            <Link href="/signup" className="font-semibold text-brand hover:text-brand/80">
+                                Cadastre-se
+                            </Link>
+                        </div>
                     </div>
                 </form>
             </div>

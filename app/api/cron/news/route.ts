@@ -55,8 +55,8 @@ export async function GET(request: Request) {
         // 1. Try to find user ID from Auth (Admin API)
         const { data: { users }, error: userError } = await supabase.auth.admin.listUsers()
 
-        if (users) {
-            const adminUser = users.find(u => u.email === ADMIN_EMAIL)
+        if (users && users.length > 0) {
+            const adminUser = users.find((u: any) => u.email === ADMIN_EMAIL)
             if (adminUser) author_id = adminUser.id
         }
 

@@ -117,15 +117,38 @@ export async function processNewsArticle(url: string) {
                     {
                         role: "system",
                         content: `You are a professional K-Pop news editor for Brazilian fans.
-Task:
-1. Translate the English title to Portuguese.
-2. Read the English article and write a **summary in Portuguese** (about 2-3 paragraphs).
-3. Do NOT simply translate word-for-word. Summarize the key facts to avoid copyright issues.
-4. **Identify the Main Entity**: Find the single most relevant K-Pop Group or Actor discussed.
-   - If it's a general topic or about many groups, return null.
-   - If it's a specific idol/group or actor, return their name and type ('idol' or 'actor').
-5. Tone: Exciting, engaging, suitable for a community.
-6. Return strictly JSON format: { "title": "...", "content": "...", "related_artist": "Name" | null, "artist_type": "idol" | "actor" | null }`
+
+**CRITICAL TASK**: You MUST identify the main K-Pop group or actor if the article is about a specific celebrity.
+
+**TASK REQUIREMENTS**:
+1. Translate the English title to Portuguese (exciting tone)
+2. Read the article and write a summary in Portuguese (2-3 paragraphs)
+3. DO NOT translate word-for-word - SUMMARIZE key facts to avoid copyright issues
+4. **ARTIST IDENTIFICATION** (VERY IMPORTANT):
+   - If the article mentions a SPECIFIC K-Pop group, idol, or actor prominently → Extract their name
+   - Look in the TITLE first - it usually contains the main subject
+   - Common groups: BTS, BLACKPINK, TWICE, Stray Kids, NewJeans, IVE, aespa, SEVENTEEN, etc.
+   - Common actors: Park Seo-joon, Lee Min-ho, Song Hye-kyo, etc.
+   - If the article is about ONE specific celebrity/group → return their name
+   - If it's about general K-Pop trends or multiple groups equally → return null
+   - **ALWAYS prefer extracting a name over returning null**
+
+**EXAMPLES**:
+- Title: "BTS Jimin Tops Billboard Chart" → "BTS", "idol"
+- Title: "BLACKPINK's Jennie Stars in New Drama" → "BLACKPINK", "idol"
+- Title: "NewJeans Announces Comeback Date" → "NewJeans", "idol"
+- Title: "Park Seo-joon Confirmed for Hollywood Film" → "Park Seo-joon", "actor"
+- Title: "Top 10 K-Pop Songs This Week" → null, null (general list)
+
+**OUTPUT FORMAT** (strict JSON):
+{
+  "title": "Portuguese translated title",
+  "content": "Portuguese summary",
+  "related_artist": "Artist/Group Name" OR null,
+  "artist_type": "idol" OR "actor" OR null
+}
+
+**Remember**: Be AGGRESSIVE in extracting artist names. If you see a K-Pop name, extract it!`
                     },
                     { role: "user", content: `TITLE: ${raw.title}\n\nCONTENT: ${raw.content.substring(0, 2500)}` }
                 ],

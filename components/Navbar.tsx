@@ -38,7 +38,7 @@ export default async function Navbar() {
                         <>
                             <Notifications />
                             {user.email === 'jundae54@gmail.com' && (
-                                <Link href="/admin" className="text-xs font-bold text-red-500 hover:text-red-400 transition-colors bg-red-500/10 px-2 py-2 sm:py-1 rounded hidden sm:inline-block">
+                                <Link href="/admin" className="text-xs font-bold text-red-500 hover:text-red-400 transition-colors bg-red-500/10 px-2 py-1 rounded">
                                     ADMIN
                                 </Link>
                             )}

@@ -1,19 +1,22 @@
 import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
-import { createComment } from '@/app/auth/actions'
+import { createComment, deletePost, deleteComment } from '@/app/auth/actions'
 import { Post, Comment } from '@/types/database'
 import { Metadata, ResolvingMetadata } from 'next'
 import ViewTracker from '@/components/ViewTracker'
 
 type Props = {
-    params: { id: string }
+    params: Promise<{ id: string }>
 }
 
+const ADMIN_EMAIL = 'jundae54@gmail.com'
+
 export async function generateMetadata(
-    { params }: Props,
+    props: Props,
     parent: ResolvingMetadata
 ): Promise<Metadata> {
-    const id = (await params).id
+    const params = await props.params
+    const id = params.id
     const supabase = await createClient()
 
     const { data: post } = await supabase.from('posts').select('*').eq('id', id).single()
@@ -35,10 +38,11 @@ export async function generateMetadata(
     }
 }
 
-export default async function PostPage({ params }: Props) {
+export default async function PostPage(props: Props) {
+    const params = await props.params
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    const { id } = await params
+    const { id } = params
 
     // Fetch Post
     const { data: post } = await supabase
@@ -50,6 +54,23 @@ export default async function PostPage({ params }: Props) {
     if (!post) {
         notFound()
     }
+
+    // Check Permissions
+    const isAuthor = user?.id === post.author_id
+    const isSuperAdmin = user?.email === ADMIN_EMAIL
+    let isModerator = false
+
+    if (user && post.group_id) {
+        const { data: mod } = await supabase
+            .from('group_moderators')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('group_id', post.group_id)
+            .single()
+        if (mod) isModerator = true
+    }
+
+    const canDeletePost = isAuthor || isSuperAdmin || isModerator
 
     // Fetch Comments
     const { data: comments } = await supabase
@@ -64,11 +85,21 @@ export default async function PostPage({ params }: Props) {
             {/* Post Content */}
             <article className="mb-8 sm:mb-12">
                 <header className="mb-6">
-                    <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                        {post.group && <span className="text-brand font-medium">#{post.group.name}</span>}
-                        {!post.group && <span className="text-brand font-medium">📰 Notícia</span>}
-                        <span>•</span>
-                        <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                        <div className="flex items-center gap-2">
+                            {post.group && <span className="text-brand font-medium">#{post.group.name}</span>}
+                            {!post.group && <span className="text-brand font-medium">📰 Notícia</span>}
+                            <span>•</span>
+                            <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                        </div>
+                        {canDeletePost && (
+                            <form action={deletePost}>
+                                <input type="hidden" name="postId" value={post.id} />
+                                <button className="text-xs text-red-500 hover:text-red-400 bg-red-500/10 px-3 py-1.5 rounded-lg transition-colors">
+                                    Excluir Post
+                                </button>
+                            </form>
+                        )}
                     </div>
                     <h1 className="text-2xl sm:text-4xl font-bold text-white mb-4 leading-tight">{post.title}</h1>
                     <div className="flex items-center gap-3">
@@ -96,13 +127,6 @@ export default async function PostPage({ params }: Props) {
                 <div className="prose prose-invert prose-lg max-w-none text-zinc-300 whitespace-pre-wrap">
                     {post.content}
                 </div>
-
-                {/* Image hidden for copyright safety */}
-                {/* {post.image_url && (
-                    <div className="mt-8 rounded-xl overflow-hidden">
-                        <img src={post.image_url} alt="" className="w-full object-cover" />
-                    </div>
-                )} */}
             </article>
 
             {/* Comments Section */}
@@ -111,27 +135,42 @@ export default async function PostPage({ params }: Props) {
 
                 {/* Comment List */}
                 <div className="space-y-6 mb-10">
-                    {comments?.map((comment: Comment) => (
-                        <div key={comment.id} className="flex gap-4">
-                            <div className="h-8 w-8 rounded-full bg-zinc-800 flex-shrink-0 overflow-hidden">
-                                {comment.author?.avatar_url ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img src={comment.author.avatar_url} alt="" className="h-full w-full object-cover" />
-                                ) : (
-                                    <div className="h-full w-full flex items-center justify-center text-xs font-bold text-zinc-500">
-                                        {comment.author?.full_name?.substring(0, 1) || '?'}
-                                    </div>
-                                )}
-                            </div>
-                            <div>
-                                <div className="flex items-baseline gap-2">
-                                    <span className="font-semibold text-white text-sm">{comment.author?.full_name || 'User'}</span>
-                                    <span className="text-xs text-zinc-500">{new Date(comment.created_at).toLocaleDateString()}</span>
+                    {comments?.map((comment: Comment) => {
+                        const isCommentAuthor = user?.id === comment.author_id
+                        const canDeleteComment = isCommentAuthor || isSuperAdmin || isModerator
+                        return (
+                            <div key={comment.id} className="flex gap-4 group">
+                                <div className="h-8 w-8 rounded-full bg-zinc-800 flex-shrink-0 overflow-hidden">
+                                    {comment.author?.avatar_url ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img src={comment.author.avatar_url} alt="" className="h-full w-full object-cover" />
+                                    ) : (
+                                        <div className="h-full w-full flex items-center justify-center text-xs font-bold text-zinc-500">
+                                            {comment.author?.full_name?.substring(0, 1) || '?'}
+                                        </div>
+                                    )}
                                 </div>
-                                <p className="text-zinc-300 mt-1 text-sm">{comment.content}</p>
+                                <div className="flex-1">
+                                    <div className="flex items-baseline justify-between">
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="font-semibold text-white text-sm">{comment.author?.full_name || 'User'}</span>
+                                            <span className="text-xs text-zinc-500">{new Date(comment.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                        {canDeleteComment && (
+                                            <form action={deleteComment} className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <input type="hidden" name="commentId" value={comment.id} />
+                                                <input type="hidden" name="postId" value={post.id} />
+                                                <button className="text-xs text-red-500 hover:text-red-400">
+                                                    Excluir
+                                                </button>
+                                            </form>
+                                        )}
+                                    </div>
+                                    <p className="text-zinc-300 mt-1 text-sm">{comment.content}</p>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
 
                 {/* Comment Form */}

@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { deletePost, deleteComment } from '../../actions'
+import { deletePost, deleteComment, toggleModerator } from '../../actions'
 
 const ADMIN_EMAIL = 'jundae54@gmail.com'
 
@@ -18,6 +18,15 @@ export default async function AdminUserPage(props: { params: Promise<{ id: strin
 
     // Fetch profile
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single()
+
+    // Fetch all groups (for moderator assignment)
+    const { data: groups } = await supabase.from('groups').select('*').order('name')
+
+    // Fetch existing moderator permissions for this user
+    const { data: moderators } = await supabase
+        .from('group_moderators')
+        .select('group_id')
+        .eq('user_id', userId)
 
     // Fetch posts
     const { data: posts } = await supabase
@@ -52,6 +61,47 @@ export default async function AdminUserPage(props: { params: Promise<{ id: strin
                 <div>
                     <h1 className="text-2xl font-bold text-white">{profile?.full_name || 'Anonymous'}</h1>
                     <p className="text-sm font-mono text-zinc-500">{userId}</p>
+                </div>
+            </div>
+
+            {/* Moderator Permissions */}
+            <div className="mb-8">
+                <h2 className="text-lg font-bold text-white mb-4">Moderator Permissions</h2>
+                <div className="rounded-xl border border-white/5 bg-zinc-900/50 p-6">
+                    <p className="text-sm text-zinc-400 mb-4">
+                        Assign this user as a "Category Head" to manage content within specific groups.
+                    </p>
+
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {groups?.map((group) => {
+                            const isMod = moderators?.some(m => m.group_id === group.id)
+                            return (
+                                <div key={group.id} className={`flex items-center justify-between p-3 rounded-lg border ${isMod ? 'bg-brand/10 border-brand/30' : 'bg-zinc-800/50 border-white/5'}`}>
+                                    <div className="flex items-center gap-2">
+                                        <span className={`text-sm font-medium ${isMod ? 'text-brand' : 'text-zinc-300'}`}>
+                                            {group.name}
+                                        </span>
+                                        <span className="text-xs text-zinc-500 uppercase">
+                                            {group.type}
+                                        </span>
+                                    </div>
+                                    <form action={toggleModerator}>
+                                        <input type="hidden" name="userId" value={userId} />
+                                        <input type="hidden" name="groupId" value={group.id} />
+                                        <input type="hidden" name="isModerator" value={isMod ? 'true' : 'false'} />
+                                        <button
+                                            className={`text-xs px-2 py-1 rounded transition-colors ${isMod
+                                                ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
+                                                : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'
+                                                }`}
+                                        >
+                                            {isMod ? 'Remove' : 'Assign'}
+                                        </button>
+                                    </form>
+                                </div>
+                            )
+                        })}
+                    </div>
                 </div>
             </div>
 

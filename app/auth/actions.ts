@@ -17,7 +17,7 @@ export async function login(formData: FormData) {
     })
 
     if (error) {
-        redirect('/login?error=Invalid email or password')
+        redirect('/login?error=' + encodeURIComponent('Email ou senha inválidos'))
     }
 
     revalidatePath('/', 'layout')
@@ -31,10 +31,12 @@ export async function signup(formData: FormData) {
     const password = formData.get('password') as string
     const fullName = formData.get('fullName') as string
 
-    // Robust origin detection: prefer env var (Vercel automatic), fallback to headers
-    const origin = process.env.NEXT_PUBLIC_SITE_URL ||
-        process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
-        (await headers()).get('origin') || 'http://localhost:3000'
+    // Prioritize run-time origin (headers) over build-time env vars
+    // This ensures redirect matches the domain the user is actually on (custom domain or vercel.app)
+    const requestOrigin = (await headers()).get('origin')
+    const origin = requestOrigin ||
+        process.env.NEXT_PUBLIC_SITE_URL ||
+        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
 
     try {
         const { error } = await supabase.auth.signUp({
@@ -58,11 +60,11 @@ export async function signup(formData: FormData) {
             throw e // Let Next.js redirect handle it
         }
         console.error('Unexpected signup error:', e)
-        redirect('/signup?error=Something went wrong. Please try again.')
+        redirect('/signup?error=' + encodeURIComponent('Algo deu errado. Tente novamente.'))
     }
 
     revalidatePath('/', 'layout')
-    redirect('/login?message=Check email to continue sign in process')
+    redirect('/signup/confirmation')
 }
 
 export async function signout() {

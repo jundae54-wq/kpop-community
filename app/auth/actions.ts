@@ -36,12 +36,23 @@ export async function signup(formData: FormData) {
         redirect('/signup?error=' + encodeURIComponent('As senhas não coincidem'))
     }
 
-    // Prioritize run-time origin (headers) over build-time env vars
-    // This ensures redirect matches the domain the user is actually on (custom domain or vercel.app)
-    const requestOrigin = (await headers()).get('origin')
-    const origin = requestOrigin ||
-        process.env.NEXT_PUBLIC_SITE_URL ||
-        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
+    // Determine the base URL for the redirect
+    // 1. In Vercel production, use necessary env vars
+    // 2. Fallback to origin header (client likely knows best)
+    // 3. Last resort: localhost
+    let origin = 'http://localhost:3000'
+
+    if (process.env.NEXT_PUBLIC_SITE_URL) {
+        origin = process.env.NEXT_PUBLIC_SITE_URL
+    } else if (process.env.VERCEL_URL) {
+        origin = `https://${process.env.VERCEL_URL}`
+    } else {
+        const headerOrigin = (await headers()).get('origin')
+        if (headerOrigin) origin = headerOrigin
+    }
+
+    // Ensure no trailing slash
+    origin = origin.replace(/\/$/, '')
 
     try {
         const { error } = await supabase.auth.signUp({

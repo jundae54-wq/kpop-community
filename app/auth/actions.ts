@@ -29,7 +29,12 @@ export async function signup(formData: FormData) {
 
     const email = formData.get('email') as string
     const password = formData.get('password') as string
+    const confirmPassword = formData.get('confirmPassword') as string
     const fullName = formData.get('fullName') as string
+
+    if (password !== confirmPassword) {
+        redirect('/signup?error=' + encodeURIComponent('As senhas não coincidem'))
+    }
 
     // Prioritize run-time origin (headers) over build-time env vars
     // This ensures redirect matches the domain the user is actually on (custom domain or vercel.app)

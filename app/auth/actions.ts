@@ -54,8 +54,19 @@ export async function signup(formData: FormData) {
     // Ensure no trailing slash
     origin = origin.replace(/\/$/, '')
 
+    // Check if nickname (full_name) is already taken
+    const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .ilike('full_name', fullName) // Case-insensitive check
+        .single()
+
+    if (existingProfile) {
+        redirect('/signup?error=' + encodeURIComponent('Este apelido já está em uso. Escolha outro.'))
+    }
+
     try {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
@@ -69,8 +80,17 @@ export async function signup(formData: FormData) {
 
         if (error) {
             console.error('Signup error:', error)
+            // Handle specific "User already registered" error
+            if (error.message.includes('already registered') || error.message.includes('unique constraint')) {
+                redirect('/login?message=' + encodeURIComponent('Este email já está cadastrado. Faça login.'))
+            }
             redirect('/signup?error=' + encodeURIComponent(error.message))
         }
+
+        // If signup is successful but user identity is null, it usually means email exists but unconfirmed (if enumeration protection is on)
+        // OR it's just a normal unconfirmed signup. Supabase doesn't easily distinguish without Admin API.
+        // But for verified users trying to signup again, Supabase usually returns an error or fake success.
+
     } catch (e: any) {
         if (e?.message?.includes('NEXT_REDIRECT')) {
             throw e // Let Next.js redirect handle it

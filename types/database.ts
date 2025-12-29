@@ -26,6 +26,7 @@ export type Post = {
     updated_at: string | null
     image_url: string | null
     views: number
+    is_hidden: boolean // New field
 
     // Relations (Joined)
     author?: Profile

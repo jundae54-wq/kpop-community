@@ -64,6 +64,46 @@ export default async function AdminUserPage(props: { params: Promise<{ id: strin
                 </div>
             </div>
 
+            {/* User Info */}
+            <div className="mb-8">
+                <h2 className="text-lg font-bold text-white mb-4">User Info</h2>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="bg-zinc-900/50 p-6 rounded-xl border border-white/10">
+                        <h3 className="text-sm font-medium text-zinc-400 mb-2">Email</h3>
+                        <p className="text-white">{user.email}</p>
+                    </div>
+
+                    <div className="bg-zinc-900/50 p-6 rounded-xl border border-white/10">
+                        <h3 className="text-sm font-medium text-zinc-400 mb-2">Email Verified</h3>
+                        {user.email_confirmed_at ? (
+                            <div className="flex items-center gap-2">
+                                <span className="inline-flex items-center rounded-full bg-green-400/10 px-3 py-1 text-sm font-medium text-green-400 ring-1 ring-inset ring-green-400/20">
+                                    ✓ Verified
+                                </span>
+                                <span className="text-xs text-zinc-500">
+                                    {new Date(user.email_confirmed_at).toLocaleString()}
+                                </span>
+                            </div>
+                        ) : (
+                            <span className="inline-flex items-center rounded-full bg-amber-400/10 px-3 py-1 text-sm font-medium text-amber-400 ring-1 ring-inset ring-amber-400/20">
+                                ✗ Not Verified
+                            </span>
+                        )}
+                    </div>
+
+                    <div className="bg-zinc-900/50 p-6 rounded-xl border border-white/10">
+                        <h3 className="text-sm font-medium text-zinc-400 mb-2">Join Date</h3>
+                        <p className="text-white">{new Date(user.created_at).toLocaleString('ko-KR', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}</p>
+                    </div>
+                </div>
+            </div>
+
             {/* Moderator Permissions */}
             <div className="mb-8">
                 <h2 className="text-lg font-bold text-white mb-4">Moderator Permissions</h2>

@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { deletePost } from './actions'
 
+export const dynamic = 'force-dynamic'
+
 const ADMIN_EMAIL = 'jundae54@gmail.com'
 
 export default async function AdminPage() {

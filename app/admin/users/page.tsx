@@ -4,10 +4,24 @@ import { banUser, deleteUser } from '../admin-actions'
 
 export default async function AdminUsersPage() {
     const supabaseAdmin = createAdminClient()
-    const { data: { users }, error } = await supabaseAdmin.auth.admin.listUsers()
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers()
 
-    // Fetch profiles to get nicknames
-    const { data: profiles } = await supabaseAdmin.from('profiles').select('id, full_name, avatar_url')
+    if (error || !data) {
+        console.error('Failed to list users:', error)
+        return (
+            <div className="p-8 text-center bg-zinc-900 rounded-xl border border-red-500/20">
+                <h3 className="text-red-400 font-bold mb-2">Failed to load users</h3>
+                <p className="text-zinc-400 text-sm mb-4">
+                    This usually means the Service Role Key is missing or invalid.
+                </p>
+                <code className="block bg-black/30 p-2 rounded text-xs text-red-300 overflow-x-auto">
+                    {error?.message || 'No data returned'}
+                </code>
+            </div>
+        )
+    }
+
+    const { users } = data
     const profileMap = new Map(profiles?.map(p => [p.id, p]))
 
     // Fetch moderators
@@ -77,8 +91,8 @@ export default async function AdminUsersPage() {
                                                 <input type="hidden" name="userId" value={u.id} />
                                                 <input type="hidden" name="banDuration" value={isBanned ? 'none' : 'permanent'} />
                                                 <button className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${isBanned
-                                                        ? 'text-zinc-300 bg-white/5 hover:bg-white/10'
-                                                        : 'text-amber-400 bg-amber-400/10 hover:bg-amber-400/20'
+                                                    ? 'text-zinc-300 bg-white/5 hover:bg-white/10'
+                                                    : 'text-amber-400 bg-amber-400/10 hover:bg-amber-400/20'
                                                     }`}>
                                                     {isBanned ? 'Unban' : 'Ban'}
                                                 </button>

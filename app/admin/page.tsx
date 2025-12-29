@@ -17,7 +17,6 @@ export default async function AdminPage() {
     const supabaseAdmin = createAdminClient()
 
     // 1. Stats
-    const { count: userCount } = await supabaseAdmin.auth.admin.listUsers()
     // note: listUsers returns pagination, for count we might need another way or just use length of page 1 if small, 
     // but better is to just show "Recent Users" count or no count if expensive. 
     // Actually listUsers() returns an object with users array. It doesn't give total count easily without iterating.

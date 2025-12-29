@@ -5,11 +5,14 @@ import { banUser, deleteUser } from '../admin-actions'
 export const dynamic = 'force-dynamic'
 
 export default async function AdminUsersPage() {
-    const supabaseAdmin = createAdminClient()
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers()
+    try {
+        const supabaseAdmin = createAdminClient()
+        const { data, error } = await supabaseAdmin.auth.admin.listUsers()
 
-    if (error || !data) {
-        console.error('Failed to list users:', error)
+        if (error || !data) {
+            console.error('Failed to list users:', error)
+            throw new Error(error?.message || 'Failed to list users (Empty Data)')
+        }
         return (
             <div className="p-8 text-center bg-zinc-900 rounded-xl border border-red-500/20">
                 <h3 className="text-red-400 font-bold mb-2">Failed to load users</h3>

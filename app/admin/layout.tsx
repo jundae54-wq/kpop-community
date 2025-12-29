@@ -10,9 +10,9 @@ export default async function AdminLayout({
     children: React.ReactNode
 }) {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data, error } = await supabase.auth.getUser()
 
-    if (!user || user.email !== ADMIN_EMAIL) {
+    if (error || !data?.user || data.user.email !== ADMIN_EMAIL) {
         redirect('/')
     }
 

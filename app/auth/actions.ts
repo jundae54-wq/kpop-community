@@ -351,5 +351,18 @@ export async function updatePassword(formData: FormData) {
     }
 
     revalidatePath('/', 'layout')
+    revalidatePath('/', 'layout')
     redirect('/login?message=' + encodeURIComponent('Senha atualizada com sucesso! Faça login.'))
+}
+
+export async function checkNicknameAvailability(nickname: string) {
+    const supabase = await createClient()
+
+    const { data } = await supabase
+        .from('profiles')
+        .select('id')
+        .ilike('full_name', nickname)
+        .single()
+
+    return !!data // Returns true if nickname exists (taken), false if available
 }

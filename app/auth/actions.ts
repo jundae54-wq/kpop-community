@@ -296,9 +296,23 @@ export async function requestPasswordReset(formData: FormData) {
     const supabase = await createClient()
     const email = formData.get('email') as string
 
-    const origin = process.env.NEXT_PUBLIC_SITE_URL ||
-        process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
-        (await headers()).get('origin') || 'http://localhost:3000'
+    // Determine the base URL for the redirect
+    // 1. In Vercel production, use necessary env vars
+    // 2. Fallback to origin header (client likely knows best)
+    // 3. Last resort: localhost
+    let origin = 'http://localhost:3000'
+
+    if (process.env.NEXT_PUBLIC_SITE_URL) {
+        origin = process.env.NEXT_PUBLIC_SITE_URL
+    } else if (process.env.VERCEL_URL) {
+        origin = `https://${process.env.VERCEL_URL}`
+    } else {
+        const headerOrigin = (await headers()).get('origin')
+        if (headerOrigin) origin = headerOrigin
+    }
+
+    // Ensure no trailing slash
+    origin = origin.replace(/\/$/, '')
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${origin}/update-password`,
@@ -306,10 +320,12 @@ export async function requestPasswordReset(formData: FormData) {
 
     if (error) {
         console.error('Password reset error:', error)
-        redirect('/reset-password?error=' + encodeURIComponent('Falha ao enviar email. Verifique o endereço.'))
+        // For security reasons, often we don't want to explicitly say if email exists or not, 
+        // but here we are being explicit for UX.
+        redirect('/reset-password?error=' + encodeURIComponent('Não foi possível enviar o email. Tente novamente.'))
     }
 
-    redirect('/reset-password?message=' + encodeURIComponent('Email enviado! Verifique sua caixa de entrada.'))
+    redirect('/reset-password/confirmation')
 }
 
 export async function updatePassword(formData: FormData) {

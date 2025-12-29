@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/utils/supabase/admin'
 import Link from 'next/link'
 import { adminDeleteComment } from '../admin-actions'
+import { ConfirmDeleteButton } from '@/components/admin/ConfirmDeleteButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,12 +58,11 @@ export default async function AdminCommentsPage() {
                                     </div>
                                 </td>
                                 <td className="p-4 text-right">
-                                    <form action={adminDeleteComment} onSubmit={(e) => !confirm('Delete comment?') && e.preventDefault()}>
-                                        <input type="hidden" name="commentId" value={comment.id} />
-                                        <button className="px-3 py-1.5 text-xs font-medium text-red-400 bg-red-400/10 hover:bg-red-400/20 rounded transition-colors">
-                                            Delete
-                                        </button>
-                                    </form>
+                                    <ConfirmDeleteButton
+                                        action={adminDeleteComment}
+                                        itemId={comment.id}
+                                        itemType="comment"
+                                    />
                                 </td>
                             </tr>
                         ))}

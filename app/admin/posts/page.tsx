@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/utils/supabase/admin'
 import Link from 'next/link'
 import { adminDeletePost, togglePostVisibility } from '../admin-actions'
+import { ConfirmDeleteButton } from '@/components/admin/ConfirmDeleteButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -98,12 +99,11 @@ export default async function AdminPostsPage({
                                                 {post.is_hidden ? 'Show' : 'Hide'}
                                             </button>
                                         </form>
-                                        <form action={adminDeletePost} onSubmit={(e) => !confirm('Delete post?') && e.preventDefault()}>
-                                            <input type="hidden" name="postId" value={post.id} />
-                                            <button className="px-3 py-1.5 text-xs font-medium text-red-400 bg-red-400/10 hover:bg-red-400/20 rounded transition-colors">
-                                                Delete
-                                            </button>
-                                        </form>
+                                        <ConfirmDeleteButton
+                                            action={adminDeletePost}
+                                            itemId={post.id}
+                                            itemType="post"
+                                        />
                                     </div>
                                 </td>
                             </tr>

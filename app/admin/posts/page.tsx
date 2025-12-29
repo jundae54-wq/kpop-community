@@ -19,7 +19,17 @@ export default async function AdminPostsPage({
         query = query.eq('group_id', category)
     }
 
-    const { data: posts } = await query
+    const { data: posts, error } = await query
+
+    if (error || !posts) {
+        console.error('Failed to list posts:', error)
+        return (
+            <div className="p-8 text-center bg-zinc-900 rounded-xl border border-red-500/20">
+                <h3 className="text-red-400 font-bold mb-2">Failed to load posts</h3>
+                <p className="text-zinc-400 text-sm">{error?.message || 'No data available'}</p>
+            </div>
+        )
+    }
 
     // Fetch groups for filter
     const { data: groups } = await supabaseAdmin.from('groups').select('*').order('name')

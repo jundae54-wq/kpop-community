@@ -70,7 +70,7 @@ export async function signup(formData: FormData) {
             email,
             password,
             options: {
-                emailRedirectTo: `${origin}/auth/callback`,
+                emailRedirectTo: `${origin}/auth/callback?next=/signup/verified`,
                 data: {
                     full_name: fullName,
                     avatar_url: `https://api.dicebear.com/9.x/lorelei/svg?seed=${Math.random()}`,

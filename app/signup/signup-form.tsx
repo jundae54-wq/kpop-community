@@ -9,15 +9,18 @@ export default function SignupForm() {
     const [error, setError] = useState<string | null>(null)
     const [nicknameError, setNicknameError] = useState<string | null>(null)
     const [isCheckingNickname, setIsCheckingNickname] = useState(false)
+    const [isNicknameAvailable, setIsNicknameAvailable] = useState(false)
 
     async function handleNicknameBlur(e: React.FocusEvent<HTMLInputElement>) {
         const nickname = e.target.value
         if (!nickname) {
             setNicknameError(null)
+            setIsNicknameAvailable(false)
             return
         }
 
         setIsCheckingNickname(true)
+        setIsNicknameAvailable(false)
         try {
             // Dynamically import to avoid circular dependencies if any, or just use the imported action
             const { checkNicknameAvailability } = await import('@/app/auth/actions')
@@ -25,8 +28,10 @@ export default function SignupForm() {
 
             if (isTaken) {
                 setNicknameError('Este apelido já está em uso. Escolha outro.')
+                setIsNicknameAvailable(false)
             } else {
                 setNicknameError(null)
+                setIsNicknameAvailable(true)
             }
         } catch (err) {
             console.error('Failed to check nickname:', err)
@@ -81,13 +86,22 @@ export default function SignupForm() {
                             onBlur={handleNicknameBlur}
                             className={`relative block w-full rounded-lg border-0 bg-zinc-800 py-3 px-4 text-white placeholder-zinc-400 ring-1 ring-inset focus:ring-2 sm:text-sm sm:leading-6 disabled:opacity-50 ${nicknameError
                                     ? 'ring-red-500 focus:ring-red-500'
-                                    : 'ring-white/10 focus:ring-brand'
+                                    : isNicknameAvailable
+                                        ? 'ring-emerald-500/50 focus:ring-emerald-500'
+                                        : 'ring-white/10 focus:ring-brand'
                                 }`}
                             placeholder="Nome Completo (Apelido)"
                         />
                         {isCheckingNickname && (
                             <div className="absolute right-3 top-3">
                                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-500 border-t-transparent"></div>
+                            </div>
+                        )}
+                        {!isCheckingNickname && isNicknameAvailable && (
+                            <div className="absolute right-3 top-3.5 text-emerald-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                                    <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+                                </svg>
                             </div>
                         )}
                     </div>

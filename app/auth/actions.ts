@@ -84,6 +84,9 @@ export async function signup(formData: FormData) {
             if (error.message.includes('already registered') || error.message.includes('unique constraint')) {
                 redirect('/login?message=' + encodeURIComponent('Este email já está cadastrado. Faça login.'))
             }
+            if (error.message.includes('Error sending confirmation email')) {
+                redirect('/signup?error=' + encodeURIComponent('Erro ao enviar email de confirmação. Tente novamente mais tarde.'))
+            }
             redirect('/signup?error=' + encodeURIComponent(error.message))
         }
 

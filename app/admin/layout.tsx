@@ -9,10 +9,30 @@ export default async function AdminLayout({
 }: {
     children: React.ReactNode
 }) {
-    const supabase = await createClient()
-    const { data, error } = await supabase.auth.getUser()
+    try {
+        const supabase = await createClient()
+        const { data, error } = await supabase.auth.getUser()
 
-    if (error || !data?.user || data.user.email !== ADMIN_EMAIL) {
+        if (error || !data?.user || data.user.email !== ADMIN_EMAIL) {
+            redirect('/')
+        }
+    } catch (e) {
+        // If redirect throws (which is normal behavior), re-throw it needed? 
+        // Actually redirect() throws a NEXT_REDIRECT error which we should let pass, 
+        // OR we just log and redirect. 
+        // But better to separate the logic.
+        // Wait, redirect() throws an error that is CAUGHT by Next.js to handle the redirect.
+        // If we catch it here, we stop the redirect.
+        // So we must verify if 'e' is Digest or something.
+
+        // Safer approach: Let Supabase errors fall through to the boolean check, 
+        // but catch 'createClient' setup errors.
+        console.error('Admin Layout Error:', e)
+        // If it's a redirect error, re-throw it
+        if ((e as Error & { digest?: string }).digest?.startsWith('NEXT_REDIRECT')) {
+            throw e
+        }
+        // Otherwise redirect to home for safety
         redirect('/')
     }
 

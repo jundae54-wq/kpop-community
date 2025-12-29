@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -13,6 +13,14 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+export const viewport: Viewport = {
+  themeColor: "#ff2d95",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false
+};
 
 export const metadata: Metadata = {
   title: "K-Community",
@@ -31,13 +39,6 @@ export const metadata: Metadata = {
     apple: [
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" }
     ]
-  },
-  themeColor: "#ff2d95",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false
   }
 };
 

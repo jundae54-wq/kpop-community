@@ -4,6 +4,7 @@ import { createComment, deletePost, deleteComment } from '@/app/auth/actions'
 import { Post, Comment } from '@/types/database'
 import { Metadata, ResolvingMetadata } from 'next'
 import ViewTracker from '@/components/ViewTracker'
+import { BadgeRenderer } from '@/components/BadgeRenderer'
 
 type Props = {
     params: Promise<{ id: string }>
@@ -44,10 +45,13 @@ export default async function PostPage(props: Props) {
     const { data: { user } } = await supabase.auth.getUser()
     const { id } = params
 
+    // Fetch Groups (for badges)
+    const { data: groups } = await supabase.from('groups').select('*')
+
     // Fetch Post
     const { data: post } = await supabase
         .from('posts')
-        .select(`*, author:profiles(*), group:groups(*)`)
+        .select(`*, author:profiles(full_name, active_effect, avatar_url, username, badge_left, badge_right), group:groups(*)`)
         .eq('id', id)
         .single()
 
@@ -75,7 +79,7 @@ export default async function PostPage(props: Props) {
     // Fetch Comments
     const { data: comments } = await supabase
         .from('comments')
-        .select(`*, author:profiles(*)`)
+        .select(`*, author:profiles(full_name, active_effect, avatar_url, username, badge_left, badge_right)`)
         .eq('post_id', id)
         .order('created_at', { ascending: true })
 
@@ -101,6 +105,7 @@ export default async function PostPage(props: Props) {
                             </form>
                         )}
                     </div>
+
                     <h1 className="text-2xl sm:text-4xl font-bold text-white mb-4 leading-tight">{post.title}</h1>
                     <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-zinc-700 overflow-hidden">
@@ -118,8 +123,14 @@ export default async function PostPage(props: Props) {
                             )}
                         </div>
                         <div>
-                            <p className={`text-white font-medium ${post.author && 'active_effect' in post.author && post.author.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>{!post.group ? 'K-Community Bot' : (post.author?.full_name || 'Anônimo')}</p>
-                            <p className="text-zinc-500 text-sm">Autor</p>
+                            <div className="flex items-center bg-zinc-900/50 rounded-lg pr-2 max-w-fit">
+                                <BadgeRenderer badgeId={post.author?.badge_left} groups={groups || []} />
+                                <p className={`text-white font-medium px-1 ${post.author && 'active_effect' in post.author && post.author.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>
+                                    {!post.group ? 'K-Community Bot' : (post.author?.full_name || 'Anônimo')}
+                                </p>
+                                <BadgeRenderer badgeId={post.author?.badge_right} groups={groups || []} />
+                            </div>
+                            <p className="text-zinc-500 text-sm mt-0.5">Autor</p>
                         </div>
                     </div>
                 </header>
@@ -152,8 +163,12 @@ export default async function PostPage(props: Props) {
                                 </div>
                                 <div className="flex-1">
                                     <div className="flex items-baseline justify-between">
-                                        <div className="flex items-baseline gap-2">
-                                            <span className={`font-semibold text-white text-sm ${comment.author && 'active_effect' in comment.author && comment.author.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>{comment.author?.full_name || 'User'}</span>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <div className="flex items-center">
+                                                <BadgeRenderer badgeId={comment.author?.badge_left} groups={groups || []} />
+                                                <span className={`font-semibold text-white text-sm px-1 ${comment.author && 'active_effect' in comment.author && comment.author.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>{comment.author?.full_name || 'User'}</span>
+                                                <BadgeRenderer badgeId={comment.author?.badge_right} groups={groups || []} />
+                                            </div>
                                             <span className="text-xs text-zinc-500">{new Date(comment.created_at).toLocaleDateString()}</span>
                                         </div>
                                         {canDeleteComment && (

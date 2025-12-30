@@ -57,8 +57,8 @@ export default async function AdminPostsPage({
                 </div>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-zinc-900/50 overflow-hidden">
-                <table className="w-full text-left text-sm">
+            <div className="rounded-xl border border-white/10 bg-zinc-900/50 overflow-hidden overflow-x-auto">
+                <table className="w-full text-left text-sm min-w-[800px]">
                     <thead className="bg-white/5 text-zinc-400">
                         <tr>
                             <th className="p-4 font-medium">Title</th>

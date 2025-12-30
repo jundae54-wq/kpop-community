@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { deletePost, deleteComment, toggleModerator } from '../../actions'
@@ -8,13 +9,25 @@ const ADMIN_EMAIL = 'jundae54@gmail.com'
 export default async function AdminUserPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user: currentUser } } = await supabase.auth.getUser()
 
-    if (!user || user.email !== ADMIN_EMAIL) {
+    if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
         redirect('/')
     }
 
     const userId = params.id
+    const supabaseAdmin = createAdminClient()
+
+    // Fetch target user data (email, created_at, etc.)
+    const { data: { user: targetUser }, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId)
+
+    if (userError || !targetUser) {
+        return (
+            <div className="mx-auto max-w-5xl py-8 px-4 text-white">
+                Error loading user: {userError?.message || 'User not found'}
+            </div>
+        )
+    }
 
     // Fetch profile
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single()
@@ -70,18 +83,18 @@ export default async function AdminUserPage(props: { params: Promise<{ id: strin
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <div className="bg-zinc-900/50 p-6 rounded-xl border border-white/10">
                         <h3 className="text-sm font-medium text-zinc-400 mb-2">Email</h3>
-                        <p className="text-white">{user.email}</p>
+                        <p className="text-white">{targetUser.email}</p>
                     </div>
 
                     <div className="bg-zinc-900/50 p-6 rounded-xl border border-white/10">
                         <h3 className="text-sm font-medium text-zinc-400 mb-2">Email Verified</h3>
-                        {user.email_confirmed_at ? (
+                        {targetUser.email_confirmed_at ? (
                             <div className="flex items-center gap-2">
                                 <span className="inline-flex items-center rounded-full bg-green-400/10 px-3 py-1 text-sm font-medium text-green-400 ring-1 ring-inset ring-green-400/20">
                                     ✓ Verified
                                 </span>
                                 <span className="text-xs text-zinc-500">
-                                    {new Date(user.email_confirmed_at).toLocaleString()}
+                                    {new Date(targetUser.email_confirmed_at).toLocaleString()}
                                 </span>
                             </div>
                         ) : (
@@ -93,7 +106,7 @@ export default async function AdminUserPage(props: { params: Promise<{ id: strin
 
                     <div className="bg-zinc-900/50 p-6 rounded-xl border border-white/10">
                         <h3 className="text-sm font-medium text-zinc-400 mb-2">Join Date</h3>
-                        <p className="text-white">{new Date(user.created_at).toLocaleString('ko-KR', {
+                        <p className="text-white">{new Date(targetUser.created_at).toLocaleString('ko-KR', {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',

@@ -7,6 +7,8 @@ export type Profile = {
     updated_at: string | null
     points: number
     active_effect: string | null
+    badge_left: string | null
+    badge_right: string | null
 }
 
 export type Group = {

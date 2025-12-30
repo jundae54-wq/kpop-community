@@ -11,13 +11,17 @@ export async function login(formData: FormData) {
     const email = formData.get('email') as string
     const password = formData.get('password') as string
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
     })
 
     if (error) {
         redirect('/login?error=' + encodeURIComponent('Email ou senha inválidos'))
+    }
+
+    if (data.user) {
+        await incrementPoints(data.user.id, 10)
     }
 
     revalidatePath('/', 'layout')

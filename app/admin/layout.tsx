@@ -37,22 +37,22 @@ export default async function AdminLayout({
     }
 
     return (
-        <div className="mx-auto max-w-7xl min-h-screen py-8 px-4 flex gap-8">
+        <div className="mx-auto max-w-7xl min-h-screen py-8 px-4 flex flex-col lg:flex-row gap-8">
             {/* Sidebar Navigation */}
-            <aside className="w-64 flex-shrink-0">
-                <div className="sticky top-8">
+            <aside className="w-full lg:w-64 flex-shrink-0">
+                <div className="lg:sticky lg:top-8">
                     <h2 className="text-xl font-bold text-white mb-6 px-2">Admin Panel</h2>
-                    <nav className="space-y-1">
-                        <Link href="/admin" className="block px-3 py-2 text-sm font-medium rounded-md text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors">
+                    <nav className="flex lg:block gap-2 overflow-x-auto pb-2 lg:pb-0 lg:space-y-1">
+                        <Link href="/admin" className="flex-shrink-0 block px-3 py-2 text-sm font-medium rounded-md text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors whitespace-nowrap">
                             Dashboard
                         </Link>
-                        <Link href="/admin/users" className="block px-3 py-2 text-sm font-medium rounded-md text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors">
+                        <Link href="/admin/users" className="flex-shrink-0 block px-3 py-2 text-sm font-medium rounded-md text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors whitespace-nowrap">
                             User Management
                         </Link>
-                        <Link href="/admin/posts" className="block px-3 py-2 text-sm font-medium rounded-md text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors">
+                        <Link href="/admin/posts" className="flex-shrink-0 block px-3 py-2 text-sm font-medium rounded-md text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors whitespace-nowrap">
                             Post Management
                         </Link>
-                        <Link href="/admin/comments" className="block px-3 py-2 text-sm font-medium rounded-md text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors">
+                        <Link href="/admin/comments" className="flex-shrink-0 block px-3 py-2 text-sm font-medium rounded-md text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors whitespace-nowrap">
                             Comment Management
                         </Link>
                     </nav>

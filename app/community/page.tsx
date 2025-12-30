@@ -150,7 +150,7 @@ function PostCard({ post, highlight = false }: { post: Post, highlight?: boolean
                         )}
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-white">
+                        <p className={`text-sm font-medium text-white ${post.author?.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>
                             {post.author?.full_name || 'Anônimo'}
                         </p>
                         <p className="text-xs text-zinc-500">

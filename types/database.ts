@@ -5,6 +5,8 @@ export type Profile = {
     avatar_url: string | null
     website: string | null
     updated_at: string | null
+    points: number
+    active_effect: string | null
 }
 
 export type Group = {

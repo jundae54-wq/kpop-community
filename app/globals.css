@@ -99,3 +99,28 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--muted-foreground);
 }
+
+/* Shiny Text Effect */
+.shiny-text {
+  background: linear-gradient(
+    to right,
+    #bfdbfe 20%,
+    #e879f9 40%,
+    #bfdbfe 60%,
+    #8b5cf6 80%
+  );
+  background-size: 200% auto;
+  color: #000;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 3s linear infinite;
+  font-weight: bold;
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}

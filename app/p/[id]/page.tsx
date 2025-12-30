@@ -118,7 +118,7 @@ export default async function PostPage(props: Props) {
                             )}
                         </div>
                         <div>
-                            <p className="text-white font-medium">{!post.group ? 'K-Community Bot' : (post.author?.full_name || 'Anônimo')}</p>
+                            <p className={`text-white font-medium ${post.author && 'active_effect' in post.author && post.author.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>{!post.group ? 'K-Community Bot' : (post.author?.full_name || 'Anônimo')}</p>
                             <p className="text-zinc-500 text-sm">Autor</p>
                         </div>
                     </div>
@@ -153,7 +153,7 @@ export default async function PostPage(props: Props) {
                                 <div className="flex-1">
                                     <div className="flex items-baseline justify-between">
                                         <div className="flex items-baseline gap-2">
-                                            <span className="font-semibold text-white text-sm">{comment.author?.full_name || 'User'}</span>
+                                            <span className={`font-semibold text-white text-sm ${comment.author && 'active_effect' in comment.author && comment.author.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>{comment.author?.full_name || 'User'}</span>
                                             <span className="text-xs text-zinc-500">{new Date(comment.created_at).toLocaleDateString()}</span>
                                         </div>
                                         {canDeleteComment && (

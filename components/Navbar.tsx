@@ -30,12 +30,19 @@ export default async function Navbar() {
                     <Link href="/community" className="text-zinc-300 hover:text-white transition-colors px-2 py-2 sm:px-0 sm:py-0">
                         {dict.navbar.community}
                     </Link>
+                    <Link href="/shop" className="text-zinc-300 hover:text-white transition-colors px-2 py-2 sm:px-0 sm:py-0">
+                        Shop
+                    </Link>
                     <Link href="/write" className="text-zinc-300 hover:text-white transition-colors px-2 py-2 sm:px-0 sm:py-0">
                         {dict.navbar.write}
                     </Link>
 
                     {user ? (
                         <>
+                            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-zinc-800/50 rounded-full border border-white/5">
+                                <span className="text-brand font-bold">{((await supabase.from('profiles').select('points').eq('id', user.id).single()).data?.points || 0).toLocaleString()}</span>
+                                <span className="text-[10px] text-zinc-500 uppercase tracking-wider">PTS</span>
+                            </div>
                             <Notifications />
                             {user.email === 'jundae54@gmail.com' && (
                                 <Link href="/admin" className="text-xs font-bold text-red-500 hover:text-red-400 transition-colors bg-red-500/10 px-2 py-1 rounded">

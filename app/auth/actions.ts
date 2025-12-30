@@ -113,6 +113,8 @@ export async function signout() {
     redirect('/login')
 }
 
+import { incrementPoints } from '@/utils/points'
+
 export async function createPost(formData: FormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -143,8 +145,41 @@ export async function createPost(formData: FormData) {
         redirect('/write?error=Failed to create post')
     }
 
+    // Award points
+    await incrementPoints(user.id, 10)
+
     revalidatePath('/', 'layout')
     redirect('/')
+}
+
+// ... (existing code for deletePost/deleteComment) ...
+
+export async function createComment(formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        redirect('/login')
+    }
+
+    const postId = formData.get('postId') as string
+    const content = formData.get('content') as string
+
+    const { error } = await supabase.from('comments').insert({
+        post_id: parseInt(postId),
+        content,
+        author_id: user.id,
+    })
+
+    if (error) {
+        console.error('Comment failed:', error)
+        redirect(`/p/${postId}?error=Failed to post comment`)
+    }
+
+    // Award points
+    await incrementPoints(user.id, 2)
+
+    revalidatePath(`/p/${postId}`)
 }
 
 const ADMIN_EMAIL = 'jundae54@gmail.com'
@@ -243,30 +278,6 @@ export async function deleteComment(formData: FormData) {
     revalidatePath(`/p/${comment.post_id}`)
 }
 
-export async function createComment(formData: FormData) {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-        redirect('/login')
-    }
-
-    const postId = formData.get('postId') as string
-    const content = formData.get('content') as string
-
-    const { error } = await supabase.from('comments').insert({
-        post_id: parseInt(postId),
-        content,
-        author_id: user.id,
-    })
-
-    if (error) {
-        console.error('Comment failed:', error)
-        redirect(`/p/${postId}?error=Failed to post comment`)
-    }
-
-    revalidatePath(`/p/${postId}`)
-}
 
 export async function updateProfile(formData: FormData) {
     const supabase = await createClient()

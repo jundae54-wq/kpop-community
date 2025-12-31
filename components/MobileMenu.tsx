@@ -65,7 +65,7 @@ export default function MobileMenu({ dict, user, points }: MobileMenuProps) {
                                 {dict.navbar.community}
                             </Link>
                             <Link href="/shop" onClick={close} className="block text-xl font-bold text-zinc-300 hover:text-white">
-                                Loja (Ver 2)
+                                Loja
                             </Link>
                             <Link href="/write" onClick={close} className="block text-xl font-bold text-zinc-300 hover:text-white">
                                 {dict.navbar.write}

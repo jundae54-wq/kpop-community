@@ -53,8 +53,6 @@ export async function GET(request: Request) {
             } else {
                 console.log('Article exists but missing category. Attempting to backfill...')
                 postIdToUpdate = post.id
-                // Use the author from the existing post? Or just update group_id?
-                // We'll proceed to finding group, then update.
             }
         }
 
@@ -85,7 +83,6 @@ export async function GET(request: Request) {
         let group_id: number | null = null
         if (result.related_artist) {
             console.log('AI identified artist:', result.related_artist, 'Type:', result.artist_type)
-            const normalizedName = result.related_artist.toLowerCase().trim()
 
             // 1. Check existing
             const { data: existingGroup } = await supabase
@@ -129,24 +126,24 @@ export async function GET(request: Request) {
 
         if (postIdToUpdate) {
             // Update existing post
-            const result = await supabase.from('posts')
+            const dbResult = await supabase.from('posts')
                 .update({ group_id: group_id })
                 .eq('id', postIdToUpdate)
                 .select()
-            data = result.data
-            error = result.error
+            data = dbResult.data
+            error = dbResult.error
             console.log(`✅ Backfilled category for Post ID: ${postIdToUpdate}`)
         } else {
             // Insert new post
-            const result = await supabase.from('posts').insert({
+            const dbResult = await supabase.from('posts').insert({
                 title: result.title,
                 content: result.content,
                 image_url: result.image_url,
                 author_id: author_id,
                 group_id: group_id
             }).select()
-            data = result.data
-            error = result.error
+            data = dbResult.data
+            error = dbResult.error
         }
 
         if (error) {

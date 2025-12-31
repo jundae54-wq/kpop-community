@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { createPost } from '../auth/actions'
+import { SubmitButton } from '@/components/SubmitButton'
 
 export default async function WritePage() {
     const supabase = await createClient()
@@ -84,12 +85,9 @@ export default async function WritePage() {
                 </div>
 
                 <div className="flex justify-end">
-                    <button
-                        type="submit"
-                        className="rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:bg-brand/90 transition-all"
-                    >
+                    <SubmitButton className="w-full bg-brand hover:bg-brand/90 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-brand/20">
                         Publicar Post
-                    </button>
+                    </SubmitButton>
                 </div>
             </form>
         </div>

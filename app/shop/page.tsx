@@ -118,8 +118,8 @@ export default async function ShopPage({
                                             <button
                                                 disabled={currentPoints < 100}
                                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${currentPoints >= 100
-                                                        ? 'bg-brand hover:bg-brand/90 text-white shadow-[0_0_15px_-3px_rgba(255,45,149,0.4)]'
-                                                        : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+                                                    ? 'bg-brand hover:bg-brand/90 text-white shadow-[0_0_15px_-3px_rgba(255,45,149,0.4)]'
+                                                    : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
                                                     }`}
                                             >
                                                 Comprar
@@ -147,6 +147,9 @@ export default async function ShopPage({
                                             <div>
                                                 <div className="font-bold text-white text-sm">{group.name}</div>
                                                 <div className="text-xs text-zinc-500 capitalize">{group.type}</div>
+                                                <p className="text-[10px] text-zinc-500 mt-1 leading-tight">
+                                                    Requer 1 post e 1 comentário nesta comunidade
+                                                </p>
                                             </div>
                                         </div>
 
@@ -162,8 +165,8 @@ export default async function ShopPage({
                                                     <button
                                                         disabled={currentPoints < 50}
                                                         className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${currentPoints >= 50
-                                                                ? 'bg-zinc-800 hover:bg-brand hover:text-white text-zinc-300'
-                                                                : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+                                                            ? 'bg-zinc-800 hover:bg-brand hover:text-white text-zinc-300'
+                                                            : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
                                                             }`}
                                                     >
                                                         Comprar
@@ -236,8 +239,8 @@ export default async function ShopPage({
                                                         <button
                                                             disabled={isEquippedRight} // Can't equip same to both slots? Actually logic allows it but let's allow it.
                                                             className={`w-full px-2 py-1 text-[10px] font-bold rounded border transition-colors ${isEquippedLeft
-                                                                    ? 'bg-brand text-white border-brand'
-                                                                    : 'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500'
+                                                                ? 'bg-brand text-white border-brand'
+                                                                : 'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500'
                                                                 }`}
                                                         >
                                                             {isEquippedLeft ? 'L: Equipado' : 'Equipar Esq.'}
@@ -249,8 +252,8 @@ export default async function ShopPage({
                                                         <input type="hidden" name="action" value={isEquippedRight ? 'unequip' : 'equip'} />
                                                         <button
                                                             className={`w-full px-2 py-1 text-[10px] font-bold rounded border transition-colors ${isEquippedRight
-                                                                    ? 'bg-brand text-white border-brand'
-                                                                    : 'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500'
+                                                                ? 'bg-brand text-white border-brand'
+                                                                : 'bg-zinc-900 text-zinc-400 border-zinc-700 hover:border-zinc-500'
                                                                 }`}
                                                         >
                                                             {isEquippedRight ? 'R: Equipado' : 'Equipar Dir.'}

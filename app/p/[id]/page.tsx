@@ -5,6 +5,7 @@ import { Post, Comment } from '@/types/database'
 import { Metadata, ResolvingMetadata } from 'next'
 import ViewTracker from '@/components/ViewTracker'
 import { BadgeRenderer } from '@/components/BadgeRenderer'
+import { SubmitButton } from '@/components/SubmitButton'
 
 type Props = {
     params: Promise<{ id: string }>
@@ -51,7 +52,7 @@ export default async function PostPage(props: Props) {
     // Fetch Post
     const { data: post } = await supabase
         .from('posts')
-        .select(`*, author:profiles(full_name, active_effect, avatar_url, username, badge_left, badge_right), group:groups(*)`)
+        .select(`*, author:profiles(id, full_name, active_effect, avatar_url, username, badge_left, badge_right), group:groups(*, group_moderators(user_id))`)
         .eq('id', id)
         .single()
 
@@ -124,6 +125,9 @@ export default async function PostPage(props: Props) {
                         </div>
                         <div>
                             <div className="flex items-center bg-zinc-900/50 rounded-lg pr-2 max-w-fit">
+                                {post.group && post.group.group_moderators?.some((m: any) => m.user_id === post.author?.id) && (
+                                    <BadgeRenderer badgeId={`badge_${post.group.id}`} groups={groups || []} variant="gold" />
+                                )}
                                 <BadgeRenderer badgeId={post.author?.badge_left} groups={groups || []} />
                                 <p className={`text-white font-medium px-1 ${post.author && 'active_effect' in post.author && post.author.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>
                                     {!post.group ? 'K-Community Bot' : (post.author?.full_name || 'Anônimo')}
@@ -203,9 +207,9 @@ export default async function PostPage(props: Props) {
                                 rows={2}
                                 className="w-full rounded-lg border-0 bg-zinc-900 p-3 text-white placeholder-zinc-500 focus:ring-2 focus:ring-brand mb-2"
                             />
-                            <button type="submit" className="text-sm font-semibold text-brand hover:text-brand/80 transition-colors">
+                            <SubmitButton className="text-sm font-semibold text-brand hover:text-brand/80 transition-colors">
                                 Publicar Comentário
-                            </button>
+                            </SubmitButton>
                         </div>
                     </form>
                 ) : (

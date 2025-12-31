@@ -1,5 +1,5 @@
 // Service Worker for K-Community PWA
-const CACHE_NAME = 'k-community-v1'
+const CACHE_NAME = 'k-community-v2-debug'
 const urlsToCache = [
     '/',
     '/community',
@@ -11,6 +11,7 @@ const urlsToCache = [
 
 // Install event
 self.addEventListener('install', (event) => {
+    self.skipWaiting() // Force waiting SW to become active
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => cache.addAll(urlsToCache))
@@ -41,14 +42,17 @@ self.addEventListener('fetch', (event) => {
 // Activate event - Clean up old caches
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
-                        return caches.delete(cacheName)
-                    }
-                })
-            )
-        })
+        Promise.all([
+            caches.keys().then((cacheNames) => {
+                return Promise.all(
+                    cacheNames.map((cacheName) => {
+                        if (cacheName !== CACHE_NAME) {
+                            return caches.delete(cacheName)
+                        }
+                    })
+                )
+            }),
+            self.clients.claim() // Take control of all clients immediately
+        ])
     )
 })

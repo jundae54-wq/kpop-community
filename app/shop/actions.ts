@@ -36,6 +36,35 @@ export async function buyItem(formData: FormData) {
         redirect('/shop?error=Item Inválido')
     }
 
+
+    // Purchase Condition Check (Post/Comment Activity)
+    if (dbItemType === 'badge' && itemType.startsWith('badge_')) {
+        const groupId = parseInt(itemType.split('_')[1])
+        if (!isNaN(groupId)) {
+            // Check Posts
+            const { count: postCount } = await supabase
+                .from('posts')
+                .select('*', { count: 'exact', head: true })
+                .eq('author_id', user.id)
+                .eq('group_id', groupId)
+
+            if ((postCount || 0) < 1) {
+                redirect('/shop?error=Requer pelo menos 1 post nesta comunidade!')
+            }
+
+            // Check Comments (Join with posts to filter by group_id)
+            const { count: commentCount } = await supabase
+                .from('comments')
+                .select('*, post:posts!inner(group_id)', { count: 'exact', head: true })
+                .eq('author_id', user.id)
+                .eq('post.group_id', groupId)
+
+            if ((commentCount || 0) < 1) {
+                redirect('/shop?error=Requer pelo menos 1 comentário nesta comunidade!')
+            }
+        }
+    }
+
     // 1. Check Balance
     const { data: profile } = await supabase.from('profiles').select('points').eq('id', user.id).single()
 
@@ -119,7 +148,7 @@ export async function equipBadge(formData: FormData) {
     }
 
     revalidatePath('/shop')
-    revalidatePath('/')
+    revalidatePath('/', 'layout')
 }
 
 export async function equipEffect(formData: FormData) {

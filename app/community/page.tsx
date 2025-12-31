@@ -43,9 +43,17 @@ export default async function CommunityPage(props: {
     const visibleGroups = type === 'idol' ? idols : type === 'actor' ? actors : []
 
     // 4. Main Feed Query
+    // We need to check if author is moderator of the group.
+    // Fetch group moderators nested in groups?
+    // Supabase JS allows joining.
     let query = supabase
         .from('posts')
-        .select(`*, author:profiles(full_name, active_effect, badge_left, badge_right), group:groups(*), comments:comments(count)`)
+        .select(`
+            *, 
+            author:profiles(id, full_name, active_effect, badge_left, badge_right, avatar_url), 
+            group:groups(*, group_moderators(user_id)), 
+            comments:comments(count)
+        `)
         .not('group_id', 'is', null)
         .order('created_at', { ascending: false })
 
@@ -79,7 +87,11 @@ export default async function CommunityPage(props: {
     )
 }
 
-function PostCard({ post, highlight = false, groups = [] }: { post: Post, highlight?: boolean, groups?: any[] }) {
+function PostCard({ post, highlight = false, groups = [] }: { post: Post & { group?: any }, highlight?: boolean, groups?: any[] }) {
+    // Check if author is moderator
+    // post.group.group_moderators is an array of { user_id }
+    const isModerator = post.group?.group_moderators?.some((m: any) => m.user_id === post.author?.id)
+
     return (
         <Link href={`/p/${post.id}`} className="block group">
             <article className={`rounded-xl border bg-zinc-900/50 p-5 transition-all hover:bg-zinc-800/50 ${highlight ? 'border-brand/50 shadow-lg shadow-brand/10' : 'border-white/10 hover:border-brand/30'}`}>
@@ -96,8 +108,13 @@ function PostCard({ post, highlight = false, groups = [] }: { post: Post, highli
                     </div>
                     <div>
                         <div className="flex items-center">
+                            {/* Gold Badge for Moderators */}
+                            {isModerator && post.group && (
+                                <BadgeRenderer badgeId={`badge_${post.group.id}`} groups={groups} variant="gold" />
+                            )}
+
                             <BadgeRenderer badgeId={post.author?.badge_left} groups={groups} />
-                            <p className={`text-sm font-medium text-white ${post.author?.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>
+                            <p className={`text-sm font-medium text-white px-1 ${post.author?.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>
                                 {post.author?.full_name || 'Anônimo'}
                             </p>
                             <BadgeRenderer badgeId={post.author?.badge_right} groups={groups} />

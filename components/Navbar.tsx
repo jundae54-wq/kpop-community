@@ -32,7 +32,7 @@ export default async function Navbar() {
                         {dict.navbar.community}
                     </Link>
                     <Link href="/shop" className="text-zinc-300 hover:text-white transition-colors">
-                        Shop
+                        Loja
                     </Link>
                     <Link href="/write" className="text-zinc-300 hover:text-white transition-colors">
                         {dict.navbar.write}

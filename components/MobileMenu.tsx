@@ -20,7 +20,7 @@ export default function MobileMenu({ dict, user, points }: MobileMenuProps) {
         <div className="sm:hidden">
             <button
                 onClick={toggle}
-                className="p-2 text-zinc-300 hover:text-white transition-colors"
+                className="relative z-[60] p-2 text-zinc-300 hover:text-white transition-colors"
                 aria-label="Menu"
             >
                 {isOpen ? (
@@ -36,8 +36,11 @@ export default function MobileMenu({ dict, user, points }: MobileMenuProps) {
 
             {/* Menu Overlay */}
             {isOpen && (
-                <div className="fixed inset-0 top-[65px] z-50 bg-black/95 backdrop-blur-sm animate-in fade-in slide-in-from-top-5 duration-200">
-                    <nav className="flex flex-col p-6 space-y-6">
+                <div
+                    className="fixed inset-0 h-screen w-screen z-[9999] bg-black"
+                    style={{ backgroundColor: '#000000', opacity: 1 }}
+                >
+                    <nav className="flex flex-col p-6 pt-24 space-y-6 max-h-screen overflow-y-auto">
                         {user && (
                             <div className="flex items-center justify-between pb-6 border-b border-white/10">
                                 <div className="flex items-center gap-3">
@@ -62,7 +65,7 @@ export default function MobileMenu({ dict, user, points }: MobileMenuProps) {
                                 {dict.navbar.community}
                             </Link>
                             <Link href="/shop" onClick={close} className="block text-xl font-bold text-zinc-300 hover:text-white">
-                                Shop
+                                Loja (Ver 2)
                             </Link>
                             <Link href="/write" onClick={close} className="block text-xl font-bold text-zinc-300 hover:text-white">
                                 {dict.navbar.write}

@@ -40,12 +40,22 @@ export async function GET(request: Request) {
 
         // Ensure NO DUPLICATES (Check if recent post has same title)
         const { data: existing } = await supabase.from('posts')
-            .select('id')
+            .select('id, group_id')
             .eq('title', result.title)
             .limit(1)
 
+        let postIdToUpdate: number | null = null
+
         if (existing && existing.length > 0) {
-            return NextResponse.json({ message: 'Article already exists, skipping.', title: result.title })
+            const post = existing[0]
+            if (post.group_id) {
+                return NextResponse.json({ message: 'Article already exists with category, skipping.', title: result.title })
+            } else {
+                console.log('Article exists but missing category. Attempting to backfill...')
+                postIdToUpdate = post.id
+                // Use the author from the existing post? Or just update group_id?
+                // We'll proceed to finding group, then update.
+            }
         }
 
         // Find a user to act as the Author (Admin)
@@ -115,13 +125,29 @@ export async function GET(request: Request) {
             console.log('No specific artist identified by AI for this article')
         }
 
-        const { data, error } = await supabase.from('posts').insert({
-            title: result.title,
-            content: result.content,
-            image_url: result.image_url,
-            author_id: author_id,
-            group_id: group_id
-        }).select()
+        let data, error
+
+        if (postIdToUpdate) {
+            // Update existing post
+            const result = await supabase.from('posts')
+                .update({ group_id: group_id })
+                .eq('id', postIdToUpdate)
+                .select()
+            data = result.data
+            error = result.error
+            console.log(`✅ Backfilled category for Post ID: ${postIdToUpdate}`)
+        } else {
+            // Insert new post
+            const result = await supabase.from('posts').insert({
+                title: result.title,
+                content: result.content,
+                image_url: result.image_url,
+                author_id: author_id,
+                group_id: group_id
+            }).select()
+            data = result.data
+            error = result.error
+        }
 
         if (error) {
             console.error('Supabase Insert Error:', error)

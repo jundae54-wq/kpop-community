@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio'
 import OpenAI from 'openai'
-import { createClient } from './supabase/server'
+// import { createClient } from './supabase/server' // Unused
 
 // Initialize OpenAI
 const openai = process.env.OPENAI_API_KEY
@@ -66,7 +66,7 @@ export async function scrapeArticle(url: string): Promise<{ title: string; conte
     }
 }
 
-export async function findLatestArticleUrl(listingUrl: string): Promise<string | null> {
+export async function findLatestArticleUrl(_listingUrl: string): Promise<string | null> {
     try {
         // Use Soompi RSS Feed (Most reliable)
         const targetListingUrl = 'https://www.soompi.com/feed'

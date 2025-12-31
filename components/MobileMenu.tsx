@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { signout } from '@/app/auth/actions'
 
 type MobileMenuProps = {
-    dict: any
+    dict: Record<string, any> // Generalized dict
     user: any
     points: number
 }

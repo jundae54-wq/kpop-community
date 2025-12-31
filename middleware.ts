@@ -7,7 +7,7 @@ export async function middleware(request: NextRequest) {
 
     // 2. Localization Logic
     // Force 'pt' for everyone as per user request
-    let locale = 'pt'
+    const locale = 'pt'
 
     // (Previously detected based on header, now disabled)
     // const country = request.headers.get('x-vercel-ip-country')

@@ -1,12 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { BadgeRenderer } from '@/components/BadgeRenderer'
-
-// ... (fetch groups is done in previous step, but I need to pass it to the map)
-// Wait, 'groups' variable is available in the scope of default function.
-// So inside props map...
-
-// Adding Import at the top
 import { Post } from '@/types/database'
+import Link from 'next/link'
 
 export default async function CommunityPage(props: {
     searchParams: Promise<{ type?: string; category?: string }>
@@ -43,9 +38,6 @@ export default async function CommunityPage(props: {
     const visibleGroups = type === 'idol' ? idols : type === 'actor' ? actors : []
 
     // 4. Main Feed Query
-    // We need to check if author is moderator of the group.
-    // Fetch group moderators nested in groups?
-    // Supabase JS allows joining.
     let query = supabase
         .from('posts')
         .select(`
@@ -68,7 +60,68 @@ export default async function CommunityPage(props: {
 
     return (
         <div className="mx-auto max-w-2xl py-8 px-4">
-            {/* ... (rest of the layout) keep existing ... */}
+            {/* 1. Trending Section */}
+            <div className="mb-10">
+                <h2 className="text-lg font-bold text-brand mb-4 flex items-center gap-2">
+                    🔥 Destaques do Dia
+                </h2>
+                {trendingPost ? (
+                    <PostCard post={trendingPost} highlight groups={groups || []} />
+                ) : (
+                    <div className="rounded-xl border border-white/5 bg-zinc-900/30 p-6 text-center text-zinc-500 text-sm">
+                        Nenhum destaque hoje ainda.
+                    </div>
+                )}
+            </div>
+
+            {/* 2. Type Navigation (Idol / Actor) */}
+            <div className="grid grid-cols-2 gap-4 mb-8">
+                <Link
+                    href="/community?type=idol"
+                    className={`relative overflow-hidden flex h-24 flex-col items-center justify-center rounded-2xl border transition-all duration-300 group ${type === 'idol' ? 'border-brand bg-brand/10 ring-1 ring-brand' : 'border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 hover:bg-zinc-800'}`}
+                >
+                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-gradient-to-br from-brand to-purple-600`} />
+                    <span className="text-3xl mb-1">🎤</span>
+                    <span className={`text-lg font-bold tracking-wide ${type === 'idol' ? 'text-brand' : 'text-zinc-400 group-hover:text-white'}`}>ÍDOLOS</span>
+                </Link>
+                <Link
+                    href="/community?type=actor"
+                    className={`relative overflow-hidden flex h-24 flex-col items-center justify-center rounded-2xl border transition-all duration-300 group ${type === 'actor' ? 'border-brand bg-brand/10 ring-1 ring-brand' : 'border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 hover:bg-zinc-800'}`}
+                >
+                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-gradient-to-br from-blue-500 to-cyan-500`} />
+                    <span className="text-3xl mb-1">🎬</span>
+                    <span className={`text-lg font-bold tracking-wide ${type === 'actor' ? 'text-brand' : 'text-zinc-400 group-hover:text-white'}`}>ATORES</span>
+                </Link>
+            </div>
+
+            {/* 3. Sub-categories (Horizontal List) */}
+            {type && visibleGroups.length > 0 && (
+                <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                        <Link
+                            href={`/community?type=${type}`}
+                            className={`rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${!categoryId
+                                ? 'bg-white text-black'
+                                : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'
+                                }`}
+                        >
+                            Todos {type === 'idol' ? 'Ídolos' : 'Atores'}
+                        </Link>
+                        {visibleGroups.map((group) => (
+                            <Link
+                                key={group.id}
+                                href={`/community?type=${type}&category=${group.id}`}
+                                className={`rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${categoryId === group.id
+                                    ? 'bg-white text-black'
+                                    : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'
+                                    }`}
+                            >
+                                {group.name}
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* 4. Feed */}
             <h3 className="text-white font-bold mb-4">
@@ -89,7 +142,6 @@ export default async function CommunityPage(props: {
 
 function PostCard({ post, highlight = false, groups = [] }: { post: Post & { group?: any }, highlight?: boolean, groups?: any[] }) {
     // Check if author is moderator
-    // post.group.group_moderators is an array of { user_id }
     const isModerator = post.group?.group_moderators?.some((m: any) => m.user_id === post.author?.id)
 
     return (
@@ -120,154 +172,48 @@ function PostCard({ post, highlight = false, groups = [] }: { post: Post & { gro
                             <BadgeRenderer badgeId={post.author?.badge_right} groups={groups} />
                         </div>
                         <p className="text-xs text-zinc-500">
-                            <div className="mb-10">
-                                <h2 className="text-lg font-bold text-brand mb-4 flex items-center gap-2">
-                                    🔥 Destaques do Dia
-                                </h2>
-                                {trendingPost ? (
-                                    <PostCard post={trendingPost} highlight />
-                                ) : (
-                                    <div className="rounded-xl border border-white/5 bg-zinc-900/30 p-6 text-center text-zinc-500 text-sm">
-                                        Nenhum destaque hoje ainda.
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* 2. Type Navigation (Idol / Actor) */}
-                            <div className="grid grid-cols-2 gap-4 mb-8">
-                                <Link
-                                    href="/community?type=idol"
-                                    className={`relative overflow-hidden flex h-24 flex-col items-center justify-center rounded-2xl border transition-all duration-300 group ${type === 'idol' ? 'border-brand bg-brand/10 ring-1 ring-brand' : 'border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 hover:bg-zinc-800'}`}
-                                >
-                                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-gradient-to-br from-brand to-purple-600`} />
-                                    <span className="text-3xl mb-1">🎤</span>
-                                    <span className={`text-lg font-bold tracking-wide ${type === 'idol' ? 'text-brand' : 'text-zinc-400 group-hover:text-white'}`}>ÍDOLOS</span>
-                                </Link>
-                                <Link
-                                    href="/community?type=actor"
-                                    className={`relative overflow-hidden flex h-24 flex-col items-center justify-center rounded-2xl border transition-all duration-300 group ${type === 'actor' ? 'border-brand bg-brand/10 ring-1 ring-brand' : 'border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 hover:bg-zinc-800'}`}
-                                >
-                                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-gradient-to-br from-blue-500 to-cyan-500`} />
-                                    <span className="text-3xl mb-1">🎬</span>
-                                    <span className={`text-lg font-bold tracking-wide ${type === 'actor' ? 'text-brand' : 'text-zinc-400 group-hover:text-white'}`}>ATORES</span>
-                                </Link>
-                            </div>
-
-                            {/* 3. Sub-categories (Horizontal List) */}
-                            {type && visibleGroups.length > 0 && (
-                                <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
-                                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                                        <Link
-                                            href={`/community?type=${type}`}
-                                            className={`rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${!categoryId
-                                                ? 'bg-white text-black'
-                                                : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'
-                                                }`}
-                                        >
-                                            Todos {type === 'idol' ? 'Ídolos' : 'Atores'}
-                                        </Link>
-                                        {visibleGroups.map((group) => (
-                                            <Link
-                                                key={group.id}
-                                                href={`/community?type=${type}&category=${group.id}`}
-                                                className={`rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${categoryId === group.id
-                                                    ? 'bg-white text-black'
-                                                    : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'
-                                                    }`}
-                                            >
-                                                {group.name}
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* 4. Feed */}
-                            <h3 className="text-white font-bold mb-4">
-                                {categoryId ? 'Posts do Grupo' : type ? `Posts de ${type === 'idol' ? 'Ídolos' : 'Atores'}` : 'Posts Recentes'}
-                            </h3>
-                            <div className="space-y-6">
-                                {(!filteredPosts || filteredPosts.length === 0) ? (
-                                    <EmptyState />
-                                ) : (
-                                    filteredPosts.map((post: Post) => (
-                                        <PostCard key={post.id} post={post} />
-                                    ))
-                                )}
-                            </div>
-                    </div>
-                    )
-}
-
-                    function PostCard({post, highlight = false}: {post: Post, highlight?: boolean }) {
-    return (
-                    <Link href={`/p/${post.id}`} className="block group">
-                        <article className={`rounded-xl border bg-zinc-900/50 p-5 transition-all hover:bg-zinc-800/50 ${highlight ? 'border-brand/50 shadow-lg shadow-brand/10' : 'border-white/10 hover:border-brand/30'}`}>
-                            <div className="flex items-center gap-3 mb-3">
-                                <div className="h-8 w-8 rounded-full bg-zinc-700 overflow-hidden">
-                                    {post.author?.avatar_url ? (
-                                        // eslint-disable-next-line @next/next/no-img-element
-                                        <img src={post.author.avatar_url} alt={post.author.username || 'User'} className="h-full w-full object-cover" />
-                                    ) : (
-                                        <div className="h-full w-full flex items-center justify-center text-xs font-bold text-zinc-400">
-                                            {post.author?.full_name?.substring(0, 1) || '?'}
-                                        </div>
-                                    )}
-                                </div>
-                                <div>
-                                    <p className={`text-sm font-medium text-white ${post.author?.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>
-                                        {post.author?.full_name || 'Anônimo'}
-                                    </p>
-                                    <p className="text-xs text-zinc-500">
-                                        {new Date(post.created_at).toLocaleDateString()}
-                                    </p>
-                                </div>
-                                {post.group && (
-                                    <span className="ml-auto rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
-                                        {post.group.name}
-                                    </span>
-                                )}
-                            </div>
-
-                            <h3 className={`text-lg font-semibold text-white group-hover:text-brand transition-colors ${highlight ? 'text-xl' : ''}`}>
-                                {post.title}
-                            </h3>
-
-                            <p className="mt-2 text-sm text-zinc-400 line-clamp-2">
-                                {post.content}
-                            </p>
-
-                            {highlight && (
-                                <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
-                                    <span>🔥 Em Alta</span>
-                                    <span>•</span>
-                                    <span>{post.views || 0} visualizações</span>
-                                </div>
-                            )}
-
-                            {/* Image hidden for copyright safety */}
-                            {/* {post.image_url && (
-                    <div className="mt-4 overflow-hidden rounded-lg">
-                        <img src={post.image_url} alt="" className="h-48 w-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
-                    </div>
-                )} */}
-                        </article>
-                    </Link>
-                    )
-}
-
-                    function EmptyState() {
-    return (
-                    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-700 bg-zinc-900/20 py-20 text-center">
-                        <div className="rounded-full bg-zinc-800 p-4 mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-zinc-500">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <h3 className="text-lg font-semibold text-white">Nenhum post ainda</h3>
-                        <p className="text-sm text-zinc-500 max-w-xs mx-auto mt-2">
-                            Seja o primeiro fã a começar uma discussão!
+                            {new Date(post.created_at).toLocaleDateString()}
                         </p>
                     </div>
-                    )
+                    {post.group && (
+                        <span className="ml-auto rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
+                            {post.group.name}
+                        </span>
+                    )}
+                </div>
+
+                <h3 className={`text-lg font-semibold text-white group-hover:text-brand transition-colors ${highlight ? 'text-xl' : ''}`}>
+                    {post.title}
+                </h3>
+
+                <p className="mt-2 text-sm text-zinc-400 line-clamp-2">
+                    {post.content}
+                </p>
+
+                {highlight && (
+                    <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
+                        <span>🔥 Em Alta</span>
+                        <span>•</span>
+                        <span>{post.views || 0} visualizações</span>
+                    </div>
+                )}
+            </article>
+        </Link>
+    )
+}
+
+function EmptyState() {
+    return (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-700 bg-zinc-900/20 py-20 text-center">
+            <div className="rounded-full bg-zinc-800 p-4 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-zinc-500">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-white">Nenhum post ainda</h3>
+            <p className="text-sm text-zinc-500 max-w-xs mx-auto mt-2">
+                Seja o primeiro fã a começar uma discussão!
+            </p>
+        </div>
+    )
 }

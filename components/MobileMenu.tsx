@@ -20,7 +20,7 @@ export default function MobileMenu({ dict, user, points }: MobileMenuProps) {
         <div className="sm:hidden">
             <button
                 onClick={toggle}
-                className="relative z-[60] p-2 text-zinc-300 hover:text-white transition-colors"
+                className="relative z-[10000] p-2 text-zinc-300 hover:text-white transition-colors"
                 aria-label="Menu"
             >
                 {isOpen ? (

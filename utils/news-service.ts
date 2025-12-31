@@ -130,8 +130,10 @@ export async function processNewsArticle(url: string) {
    - Common groups: BTS, BLACKPINK, TWICE, Stray Kids, NewJeans, IVE, aespa, SEVENTEEN, etc.
    - Common actors: Park Seo-joon, Lee Min-ho, Song Hye-kyo, etc.
    - If the article is about ONE specific celebrity/group → return their name
-   - If it's about general K-Pop trends or multiple groups equally → return null
    - **ALWAYS prefer extracting a name over returning null**
+   - If multiple artists are mentioned, choose the **PRIMARY** subject (the one in the title or first paragraph).
+   - Only return null if it is a "Top 10" list or a general industry report with no specific focus.
+   - Clean the name (e.g., "BTS's Jimin" -> "Jimin", "Member of IVE" -> "IVE" if the group is the main context, or "Wonyoung" if she is the focus). 
 
 **EXAMPLES**:
 - Title: "BTS Jimin Tops Billboard Chart" → "BTS", "idol"

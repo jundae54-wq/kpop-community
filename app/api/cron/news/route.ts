@@ -97,7 +97,7 @@ export async function GET(request: Request) {
                     .from('groups')
                     .insert({
                         name: result.related_artist,
-                        slug: result.related_artist.toLowerCase().replace(/\s+/g, '-'),
+                        slug: result.related_artist.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-'),
                         type: type,
                         image_url: null // Can be filled later or by another valid image source
                     })

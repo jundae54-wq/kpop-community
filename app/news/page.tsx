@@ -18,7 +18,7 @@ export default async function NewsPage() {
             author:profiles(*),
             group:groups(*)
         `)
-        .is('group_id', null)
+        .like('content', '%Source: [Soompi]%') // Identify news by source signature
         .order('created_at', { ascending: false })
 
     return (

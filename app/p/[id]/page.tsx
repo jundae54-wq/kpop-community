@@ -142,6 +142,31 @@ export default async function PostPage(props: Props) {
                 <div className="prose prose-invert prose-lg max-w-none text-zinc-300 whitespace-pre-wrap">
                     {post.content}
                 </div>
+
+                {/* Category CTA */}
+                {post.group && (
+                    <div className="mt-12 p-6 rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-950 border border-brand/20 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-brand/10 rounded-full blur-2xl group-hover:bg-brand/20 transition-all"></div>
+
+                        <div className="relative z-10">
+                            <h3 className="text-lg font-bold text-white mb-2">
+                                Fã de {post.group.name}?
+                            </h3>
+                            <p className="text-zinc-400 text-sm mb-4">
+                                Junte-se à comunidade de {post.group.name} para discutir as últimas novidades, compartilhar fotos e conhecer outros fãs!
+                            </p>
+                            <a
+                                href={`/community?category=${post.group.id}&type=${post.group.type}`}
+                                className="inline-flex items-center gap-2 bg-brand text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-brand/90 transition-colors"
+                            >
+                                Ir para a Comunidade
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                                    <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                )}
             </article>
 
             {/* Comments Section */}

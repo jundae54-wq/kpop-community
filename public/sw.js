@@ -1,5 +1,5 @@
 // Service Worker for K-Community PWA
-const CACHE_NAME = 'k-community-v2-debug'
+const CACHE_NAME = 'k-community-v3-ga4'
 const urlsToCache = [
     '/',
     '/community',

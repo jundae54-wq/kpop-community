@@ -130,7 +130,7 @@ export default async function CommunityPage(props: {
             </h3>
             <div className="space-y-6">
                 {(!filteredPosts || filteredPosts.length === 0) ? (
-                    <EmptyState />
+                    <EmptyState categoryId={categoryId} />
                 ) : (
                     filteredPosts.map((post: Post) => (
                         <PostCard key={post.id} post={post} groups={groups || []} />
@@ -211,7 +211,7 @@ function PostCard({ post, highlight = false, groups = [] }: { post: Post & { gro
     )
 }
 
-function EmptyState() {
+function EmptyState({ categoryId }: { categoryId: number | null }) {
     return (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-700 bg-zinc-900/20 py-20 text-center">
             <div className="rounded-full bg-zinc-800 p-4 mb-4">
@@ -220,9 +220,15 @@ function EmptyState() {
                 </svg>
             </div>
             <h3 className="text-lg font-semibold text-white">Nenhum post ainda</h3>
-            <p className="text-sm text-zinc-500 max-w-xs mx-auto mt-2">
+            <p className="text-sm text-zinc-500 max-w-xs mx-auto mt-2 mb-6">
                 Seja o primeiro fã a começar uma discussão!
             </p>
+            <Link
+                href={categoryId ? `/write?group_id=${categoryId}` : '/write'}
+                className="bg-brand text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-brand/90 transition-colors"
+            >
+                Criar Post
+            </Link>
         </div>
     )
 }

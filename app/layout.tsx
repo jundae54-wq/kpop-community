@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import PWARegister from "@/components/PWARegister";
@@ -53,19 +52,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-zinc-950 text-zinc-100 selection:bg-brand selection:text-white`}
       >
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-BHJ4J6YFEJ"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
+        {/* GA4 Raw Tags for Source Visibility */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-BHJ4J6YFEJ"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
 
-            gtag('config', 'G-BHJ4J6YFEJ');
-          `}
-        </Script>
+              gtag('config', 'G-BHJ4J6YFEJ');
+            `,
+          }}
+        />
 
         <PWARegister />
         <Navbar />

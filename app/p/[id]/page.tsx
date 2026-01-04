@@ -6,6 +6,7 @@ import { Metadata, ResolvingMetadata } from 'next'
 import ViewTracker from '@/components/ViewTracker'
 import { BadgeRenderer } from '@/components/BadgeRenderer'
 import { SubmitButton } from '@/components/SubmitButton'
+import { PostActions } from '@/components/PostActions'
 
 type Props = {
     params: Promise<{ id: string }>
@@ -77,6 +78,18 @@ export default async function PostPage(props: Props) {
 
     const canDeletePost = isAuthor || isSuperAdmin || isModerator
 
+    // Check if liked
+    let isLiked = false
+    if (user) {
+        const { data: like } = await supabase
+            .from('likes')
+            .select('id')
+            .eq('post_id', id)
+            .eq('user_id', user.id)
+            .maybeSingle() // Use maybeSingle to avoid error if not found
+        if (like) isLiked = true
+    }
+
     // Fetch Comments
     const { data: comments } = await supabase
         .from('comments')
@@ -142,6 +155,16 @@ export default async function PostPage(props: Props) {
                 <div className="prose prose-invert prose-lg max-w-none text-zinc-300 whitespace-pre-wrap">
                     {post.content}
                 </div>
+
+                {/* Actions (Like, Share, Pin) */}
+                <PostActions
+                    postId={post.id}
+                    initialLikes={post.likes_count || 0}
+                    initialIsLiked={isLiked}
+                    isPinned={post.is_pinned || false}
+                    canPin={isSuperAdmin || isModerator}
+                    groupId={post.group_id}
+                />
 
                 {/* Category CTA */}
                 {post.group && (

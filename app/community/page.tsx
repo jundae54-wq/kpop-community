@@ -47,6 +47,7 @@ export default async function CommunityPage(props: {
             comments:comments(count)
         `)
         .not('group_id', 'is', null)
+        .order('is_pinned', { ascending: false })
         .order('created_at', { ascending: false })
 
     const { data: posts } = await query
@@ -195,6 +196,14 @@ function PostCard({ post, highlight = false, groups = [] }: { post: Post & { gro
                         <span>🔥 Em Alta</span>
                         <span>•</span>
                         <span>{post.views || 0} visualizações</span>
+                    </div>
+                )}
+
+                {post.is_pinned && (
+                    <div className="absolute top-3 right-3 text-yellow-500 bg-yellow-500/10 p-1.5 rounded-full border border-yellow-500/20 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                            <path d="M10 2c-1.1 0-2 .9-2 2v2.586l-1.293 1.293A1 1 0 006 8.586V11h3v6h2v-6h3v-2.414a1 1 0 00-.293-.707L12 6.586V4c0-1.1-.9-2-2-2z" />
+                        </svg>
                     </div>
                 )}
             </article>

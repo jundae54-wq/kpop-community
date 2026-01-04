@@ -127,7 +127,10 @@ export async function GET(request: Request) {
         if (postIdToUpdate) {
             // Update existing post
             const dbResult = await supabase.from('posts')
-                .update({ group_id: group_id })
+                .update({
+                    group_id: group_id,
+                    type: 'news' // Ensure type is set
+                })
                 .eq('id', postIdToUpdate)
                 .select()
             data = dbResult.data
@@ -140,7 +143,8 @@ export async function GET(request: Request) {
                 content: result.content,
                 image_url: result.image_url,
                 author_id: author_id,
-                group_id: group_id
+                group_id: group_id,
+                type: 'news' // Explicitly set type
             }).select()
             data = dbResult.data
             error = dbResult.error

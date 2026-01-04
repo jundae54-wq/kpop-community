@@ -30,7 +30,10 @@ export type Post = {
     updated_at: string | null
     image_url: string | null
     views: number
-    is_hidden: boolean // New field
+    is_hidden: boolean
+    likes_count: number // New
+    is_pinned: boolean // New
+    type: 'post' | 'news' // New
 
     // Relations (Joined)
     author?: Profile

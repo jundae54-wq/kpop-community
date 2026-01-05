@@ -146,68 +146,72 @@ function PostCard({ post, highlight = false, groups = [] }: { post: Post & { gro
     const isModerator = post.group?.group_moderators?.some((m: any) => m.user_id === post.author?.id)
 
     return (
-        <Link href={`/p/${post.id}`} className="block group">
-            <article className={`rounded-xl border bg-zinc-900/50 p-5 transition-all hover:bg-zinc-800/50 ${highlight ? 'border-brand/50 shadow-lg shadow-brand/10' : 'border-white/10 hover:border-brand/30'}`}>
-                <div className="flex items-center gap-3 mb-3">
-                    <div className="h-8 w-8 rounded-full bg-zinc-700 overflow-hidden">
-                        {post.author?.avatar_url ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={post.author.avatar_url} alt={post.author.username || 'User'} className="h-full w-full object-cover" />
-                        ) : (
-                            <div className="h-full w-full flex items-center justify-center text-xs font-bold text-zinc-400">
-                                {post.author?.full_name?.substring(0, 1) || '?'}
-                            </div>
-                        )}
-                    </div>
-                    <div>
-                        <div className="flex items-center">
-                            {/* Gold Badge for Moderators */}
-                            {isModerator && post.group && (
-                                <BadgeRenderer badgeId={`badge_${post.group.id}`} groups={groups} variant="gold" />
-                            )}
+        <article className={`relative rounded-xl border bg-zinc-900/50 p-5 transition-all hover:bg-zinc-800/50 group ${highlight ? 'border-brand/50 shadow-lg shadow-brand/10' : 'border-white/10 hover:border-brand/30'}`}>
+            {/* Main Post Link (Overlay) */}
+            <Link href={`/p/${post.id}`} className="absolute inset-0 z-0" aria-label={`View post: ${post.title}`} />
 
-                            <BadgeRenderer badgeId={post.author?.badge_left} groups={groups} />
-                            <p className={`text-sm font-medium text-white px-1 ${post.author?.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>
-                                {post.author?.full_name || 'Anônimo'}
-                            </p>
-                            <BadgeRenderer badgeId={post.author?.badge_right} groups={groups} />
+            <div className="flex items-center gap-3 mb-3 relative">
+                <div className="h-8 w-8 rounded-full bg-zinc-700 overflow-hidden relative z-0">
+                    {post.author?.avatar_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={post.author.avatar_url} alt={post.author.username || 'User'} className="h-full w-full object-cover" />
+                    ) : (
+                        <div className="h-full w-full flex items-center justify-center text-xs font-bold text-zinc-400">
+                            {post.author?.full_name?.substring(0, 1) || '?'}
                         </div>
-                        <p className="text-xs text-zinc-500">
-                            {new Date(post.created_at).toLocaleDateString()}
-                        </p>
-                    </div>
-                    {post.group && (
-                        <span className="ml-auto rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
-                            {post.group.name}
-                        </span>
                     )}
                 </div>
+                <div className="relative z-0">
+                    <div className="flex items-center">
+                        {/* Gold Badge for Moderators */}
+                        {isModerator && post.group && (
+                            <BadgeRenderer badgeId={`badge_${post.group.id}`} groups={groups} variant="gold" />
+                        )}
 
-                <h3 className={`text-lg font-semibold text-white group-hover:text-brand transition-colors ${highlight ? 'text-xl' : ''}`}>
-                    {post.title}
-                </h3>
-
-                <p className="mt-2 text-sm text-zinc-400 line-clamp-2">
-                    {post.content}
-                </p>
-
-                {highlight && (
-                    <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
-                        <span>🔥 Em Alta</span>
-                        <span>•</span>
-                        <span>{post.views || 0} visualizações</span>
+                        <BadgeRenderer badgeId={post.author?.badge_left} groups={groups} />
+                        <p className={`text-sm font-medium text-white px-1 ${post.author?.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>
+                            {post.author?.full_name || 'Anônimo'}
+                        </p>
+                        <BadgeRenderer badgeId={post.author?.badge_right} groups={groups} />
                     </div>
+                    <p className="text-xs text-zinc-500">
+                        {new Date(post.created_at).toLocaleDateString()}
+                    </p>
+                </div>
+                {post.group && (
+                    <Link
+                        href={`/community?category=${post.group.id}`}
+                        className="ml-auto rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent hover:bg-accent/20 transition-colors relative z-10"
+                    >
+                        {post.group.name}
+                    </Link>
                 )}
+            </div>
 
-                {post.is_pinned && (
-                    <div className="absolute top-3 right-3 text-yellow-500 bg-yellow-500/10 p-1.5 rounded-full border border-yellow-500/20 shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                            <path d="M10 2c-1.1 0-2 .9-2 2v2.586l-1.293 1.293A1 1 0 006 8.586V11h3v6h2v-6h3v-2.414a1 1 0 00-.293-.707L12 6.586V4c0-1.1-.9-2-2-2z" />
-                        </svg>
-                    </div>
-                )}
-            </article>
-        </Link>
+            <h3 className={`text-lg font-semibold text-white group-hover:text-brand transition-colors relative z-0 ${highlight ? 'text-xl' : ''}`}>
+                {post.title}
+            </h3>
+
+            <p className="mt-2 text-sm text-zinc-400 line-clamp-2 relative z-0">
+                {post.content}
+            </p>
+
+            {highlight && (
+                <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500 relative z-0">
+                    <span>🔥 Em Alta</span>
+                    <span>•</span>
+                    <span>{post.views || 0} visualizações</span>
+                </div>
+            )}
+
+            {post.is_pinned && (
+                <div className="absolute top-3 right-3 text-yellow-500 bg-yellow-500/10 p-1.5 rounded-full border border-yellow-500/20 shadow-sm z-10">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                        <path d="M10 2c-1.1 0-2 .9-2 2v2.586l-1.293 1.293A1 1 0 006 8.586V11h3v6h2v-6h3v-2.414a1 1 0 00-.293-.707L12 6.586V4c0-1.1-.9-2-2-2z" />
+                    </svg>
+                </div>
+            )}
+        </article>
     )
 }
 

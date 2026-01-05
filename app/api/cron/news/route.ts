@@ -155,7 +155,17 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: error.message }, { status: 500 })
         }
 
-        return NextResponse.json({ success: true, post: data })
+        return NextResponse.json({
+            success: true,
+            debug_info: {
+                ai_related_artist: result.related_artist,
+                ai_artist_type: result.artist_type,
+                ai_title: result.title,
+                group_id_assigned: group_id,
+                is_backfill: !!postIdToUpdate
+            },
+            post: data
+        })
 
     } catch (e: any) {
         console.error('CRITICAL CRON ERROR:', e)

@@ -105,8 +105,8 @@ export async function GET(request: Request) {
                     .insert({
                         name: result.related_artist,
                         slug: result.related_artist.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-'),
-                        type: type,
-                        image_url: null // Can be filled later or by another valid image source
+                        type: type
+                        // Removed image_url to prevent "Column does not exist" error
                     })
                     .select()
                     .single()
@@ -116,6 +116,8 @@ export async function GET(request: Request) {
                     group_id = newGroup.id
                 } else if (groupError) {
                     console.error('❌ Failed to create group:', groupError)
+                    // @ts-ignore
+                    result.group_creation_error = groupError // Pass to debug info
                 }
             }
         } else {

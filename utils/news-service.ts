@@ -134,7 +134,9 @@ Use a casual, exciting, and supportive tone (like a close friend). Use emojis!
    - **NEVER return null unless it is IMPOSSIBLE to find a name** (e.g. "Top 10 Songs of 2024").
    - Even if it's a rumor or small news, EXTRACT THE NAME.
    - Clean the name: "NewJeans's Minji" -> "NewJeans" (Group context) or "Minji" (Idol context). Prefer GROUP name usually unless solo work.
-5. **TYPE CLASSIFICATION ('idol' vs 'actor')**:
+   - **EXCLUDE AGENCIES**: Do NOT set related_artist to a company name (e.g. HYBE, SM, JYP, YG, Cube, YH Entertainment). If the news is about a company statement regarding an artist, find the **Artist's Name**. ('YH Entertainment updates on Yoo Seungeon' -> 'Yoo Seungeon').
+   - If multiple artists (e.g. Yoo Seungeon and Ji Yunseo), pick the **First Person** or the **Group Name** (EVNNE).
+6. **TYPE CLASSIFICATION ('idol' vs 'actor')**:
    - If they are a singer/idol group member -> "idol" (Keywords: Album, Comeback, Song, M/V, Concert).
    - If they are primarily an actor -> "actor" (Keywords: Drama, Movie, Series, Role, Cast).
    - If they are BOTH (e.g. Cha Eun-woo, Yoona, D.O.):

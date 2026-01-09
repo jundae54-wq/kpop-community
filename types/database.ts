@@ -5,8 +5,9 @@ export type Profile = {
     avatar_url: string | null
     website: string | null
     updated_at: string | null
-    points: number
+    points: number | null
     active_effect: string | null
+    last_login_reward: string | null
     badge_left: string | null
     badge_right: string | null
 }

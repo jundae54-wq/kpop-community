@@ -105,7 +105,11 @@ export default async function PostPage(props: Props) {
                 <header className="mb-6">
                     <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div className="flex items-center gap-2">
-                            {post.group && <span className="text-brand font-medium">#{post.group.name}</span>}
+                            {post.group && (
+                                <a href={`/community?category=${post.group.id}&type=${post.group.type}`} className="text-brand font-medium hover:underline">
+                                    #{post.group.name}
+                                </a>
+                            )}
                             {!post.group && <span className="text-brand font-medium">📰 Notícia</span>}
                             <span>•</span>
                             <span>{new Date(post.created_at).toLocaleDateString()}</span>

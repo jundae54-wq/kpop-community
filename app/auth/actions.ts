@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { createClient } from '@/utils/supabase/server'
+import { incrementPoints, checkAndAwardDailyLoginBonus } from '@/utils/points'
 
 export async function login(formData: FormData) {
     const supabase = await createClient()
@@ -21,11 +22,13 @@ export async function login(formData: FormData) {
     }
 
     if (data.user) {
-        await incrementPoints(data.user.id, 10)
+        // Daily Login Bonus
+        await checkAndAwardDailyLoginBonus(data.user.id)
+
+        revalidatePath('/', 'layout')
+        redirect('/')
     }
 
-    revalidatePath('/', 'layout')
-    redirect('/')
 }
 
 export async function signup(formData: FormData) {
@@ -117,7 +120,6 @@ export async function signout() {
     redirect('/login')
 }
 
-import { incrementPoints } from '@/utils/points'
 
 export async function createPost(formData: FormData) {
     const supabase = await createClient()

@@ -27,7 +27,6 @@ export async function incrementPoints(userId: string, amount: number) {
         }
     }
 }
-}
 
 export async function checkAndAwardDailyLoginBonus(userId: string) {
     const supabase = await createClient()

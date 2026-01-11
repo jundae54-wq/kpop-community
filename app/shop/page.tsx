@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { buyItem, equipBadge, equipEffect } from './actions'
+import ShopItemSelector from '@/components/shop/ShopItemSelector'
 
 export const dynamic = 'force-dynamic'
 
@@ -94,79 +95,12 @@ export default async function ShopPage({
             {tab === 'store' ? (
                 <div className="space-y-8">
                     {/* Special Items */}
-                    {/* Special Items */}
-                    <section>
-                        <h2 className="text-lg font-bold text-white mb-4">Cores de Nick (Pagamento Único / Consumível)</h2>
-                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-                            {/* Consumable Colors */}
-                            {[
-                                { id: 'nick-red', name: 'Vermelho', price: 100, color: 'bg-red-500' },
-                                { id: 'nick-blue', name: 'Azul', price: 100, color: 'bg-blue-500' },
-                                { id: 'nick-green', name: 'Verde', price: 100, color: 'bg-green-500' },
-                                { id: 'nick-pink', name: 'Rosa', price: 100, color: 'bg-pink-500' },
-                                { id: 'nick-purple', name: 'Roxo', price: 100, color: 'bg-purple-500' },
-                                { id: 'nick-gold', name: 'Dourado', price: 100, color: 'bg-yellow-500' },
-                            ].map((item) => (
-                                <div key={item.id} className="relative bg-zinc-900 border border-white/5 rounded-2xl p-6 hover:border-brand/50 transition-colors">
-                                    <div className={`h-12 w-12 rounded-lg ${item.color} mb-4 opacity-80`} />
-                                    <h3 className={`text-lg font-bold text-white mb-1 ${item.id}`}>User</h3>
-                                    <p className="text-sm text-zinc-400 mb-4 line-clamp-2">
-                                        Muda a cor do seu nome para {item.name}. (Gasta pontos a cada troca)
-                                    </p>
-                                    <div className="flex items-center justify-between mt-auto">
-                                        <div className="text-white font-bold text-sm">{item.price} pts</div>
-                                        <form action={buyItem}>
-                                            <input type="hidden" name="itemType" value={item.id} />
-                                            <button
-                                                disabled={currentPoints < item.price}
-                                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${currentPoints >= item.price
-                                                    ? 'bg-zinc-800 hover:bg-brand text-white border border-white/10'
-                                                    : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
-                                                    }`}
-                                            >
-                                                Comprar
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <h2 className="text-lg font-bold text-white mb-4">Especiais (Permanentes)</h2>
-                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
-                            <div className="group relative bg-zinc-900 border border-white/5 rounded-2xl p-6 hover:border-brand/50 transition-colors">
-                                <div className="absolute top-4 right-4 bg-zinc-800 text-xs font-mono text-zinc-400 px-2 py-1 rounded">
-                                    Permanente
-                                </div>
-                                <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-amber-300 to-purple-400 mb-4 animate-pulse opacity-80 group-hover:opacity-100 transition-opacity" />
-                                <h3 className="text-lg font-bold text-white mb-1 shiny-text">Shiny Nickname</h3>
-                                <p className="text-sm text-zinc-400 mb-4 line-clamp-2">
-                                    Efeito brilhante desbloqueado para sempre no inventário.
-                                </p>
-                                <div className="flex items-center justify-between mt-auto">
-                                    <div className="text-brand font-bold">100 pts</div>
-                                    <form action={buyItem}>
-                                        <input type="hidden" name="itemType" value="shiny_nickname" />
-                                        {ownedItemIds.has('shiny_nickname') ? (
-                                            <button disabled className="px-4 py-2 rounded-lg bg-white/5 text-zinc-500 text-sm font-medium cursor-not-allowed">
-                                                Adquirido
-                                            </button>
-                                        ) : (
-                                            <button
-                                                disabled={currentPoints < 100}
-                                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${currentPoints >= 100
-                                                    ? 'bg-brand hover:bg-brand/90 text-white shadow-[0_0_15px_-3px_rgba(255,45,149,0.4)]'
-                                                    : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
-                                                    }`}
-                                            >
-                                                Comprar
-                                            </button>
-                                        )}
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                    {/* Main Shop Interface */}
+                    <ShopItemSelector
+                        currentPoints={currentPoints}
+                        ownedItems={ownedItemIds}
+                        buyItemAction={buyItem}
+                    />
 
                     {/* Badge Items */}
                     <section>

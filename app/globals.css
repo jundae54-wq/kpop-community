@@ -117,6 +117,66 @@ body {
   font-weight: bold;
 }
 
+.shiny-gold {
+  background: linear-gradient(to right, #fcd34d 20%, #fbbf24 40%, #fcd34d 60%, #b45309 80%);
+  background-size: 200% auto;
+  color: #000;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 3s linear infinite;
+  font-weight: bold;
+}
+
+.shiny-ocean {
+  background: linear-gradient(to right, #67e8f9 20%, #22d3ee 40%, #67e8f9 60%, #0e7490 80%);
+  background-size: 200% auto;
+  color: #000;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 3s linear infinite;
+  font-weight: bold;
+}
+
+.shiny-sunset {
+  background: linear-gradient(to right, #fda4af 20%, #f43f5e 40%, #fda4af 60%, #9f1239 80%);
+  background-size: 200% auto;
+  color: #000;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 3s linear infinite;
+  font-weight: bold;
+}
+
+.shiny-emerald {
+  background: linear-gradient(to right, #6ee7b7 20%, #34d399 40%, #6ee7b7 60%, #064e3b 80%);
+  background-size: 200% auto;
+  color: #000;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 3s linear infinite;
+  font-weight: bold;
+}
+
+.shiny-berry {
+  background: linear-gradient(to right, #d8b4fe 20%, #c084fc 40%, #d8b4fe 60%, #7e22ce 80%);
+  background-size: 200% auto;
+  color: #000;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 3s linear infinite;
+  font-weight: bold;
+}
+
 @keyframes shine {
   to {
     background-position: 200% center;

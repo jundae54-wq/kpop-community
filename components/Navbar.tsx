@@ -34,9 +34,6 @@ export default async function Navbar() {
                     <Link href="/shop" className="text-zinc-300 hover:text-white transition-colors">
                         Loja
                     </Link>
-                    <Link href="/install" className="text-brand hover:text-brand/80 transition-colors font-semibold">
-                        Instalar App
-                    </Link>
                     <Link href="/write" className="text-zinc-300 hover:text-white transition-colors">
                         {dict.navbar.write}
                     </Link>

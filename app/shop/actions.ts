@@ -17,11 +17,11 @@ export async function buyItem(formData: FormData) {
     // Static items
     const ITEMS: Record<string, { price: number; name: string; type: 'effect' | 'badge' | 'consumable_effect' }> = {
         'shiny_nickname': { price: 100, name: 'Shiny Nickname', type: 'effect' },
-        'nick-red': { price: 30, name: 'Nome Vermelho', type: 'consumable_effect' },
-        'nick-blue': { price: 30, name: 'Nome Azul', type: 'consumable_effect' },
-        'nick-green': { price: 30, name: 'Nome Verde', type: 'consumable_effect' },
-        'nick-pink': { price: 30, name: 'Nome Rosa', type: 'consumable_effect' },
-        'nick-purple': { price: 30, name: 'Nome Roxo', type: 'consumable_effect' },
+        'nick-red': { price: 100, name: 'Nome Vermelho', type: 'consumable_effect' },
+        'nick-blue': { price: 100, name: 'Nome Azul', type: 'consumable_effect' },
+        'nick-green': { price: 100, name: 'Nome Verde', type: 'consumable_effect' },
+        'nick-pink': { price: 100, name: 'Nome Rosa', type: 'consumable_effect' },
+        'nick-purple': { price: 100, name: 'Nome Roxo', type: 'consumable_effect' },
         'nick-gold': { price: 100, name: 'Nome Dourado', type: 'consumable_effect' },
     }
 

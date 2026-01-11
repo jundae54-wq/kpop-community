@@ -100,11 +100,11 @@ export default async function ShopPage({
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
                             {/* Consumable Colors */}
                             {[
-                                { id: 'nick-red', name: 'Vermelho', price: 30, color: 'bg-red-500' },
-                                { id: 'nick-blue', name: 'Azul', price: 30, color: 'bg-blue-500' },
-                                { id: 'nick-green', name: 'Verde', price: 30, color: 'bg-green-500' },
-                                { id: 'nick-pink', name: 'Rosa', price: 30, color: 'bg-pink-500' },
-                                { id: 'nick-purple', name: 'Roxo', price: 30, color: 'bg-purple-500' },
+                                { id: 'nick-red', name: 'Vermelho', price: 100, color: 'bg-red-500' },
+                                { id: 'nick-blue', name: 'Azul', price: 100, color: 'bg-blue-500' },
+                                { id: 'nick-green', name: 'Verde', price: 100, color: 'bg-green-500' },
+                                { id: 'nick-pink', name: 'Rosa', price: 100, color: 'bg-pink-500' },
+                                { id: 'nick-purple', name: 'Roxo', price: 100, color: 'bg-purple-500' },
                                 { id: 'nick-gold', name: 'Dourado', price: 100, color: 'bg-yellow-500' },
                             ].map((item) => (
                                 <div key={item.id} className="relative bg-zinc-900 border border-white/5 rounded-2xl p-6 hover:border-brand/50 transition-colors">

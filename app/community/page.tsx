@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { BadgeRenderer } from '@/components/BadgeRenderer'
 import { Post } from '@/types/database'
 import Link from 'next/link'
+import GroupSelector from '@/components/GroupSelector'
 
 export default async function CommunityPage(props: {
     searchParams: Promise<{ type?: string; category?: string }>
@@ -95,33 +96,13 @@ export default async function CommunityPage(props: {
                 </Link>
             </div>
 
-            {/* 3. Sub-categories (Horizontal List) */}
+            {/* 3. Group Selector (Search + Filter) */}
             {type && visibleGroups.length > 0 && (
-                <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
-                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                        <Link
-                            href={`/community?type=${type}`}
-                            className={`rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${!categoryId
-                                ? 'bg-white text-black'
-                                : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'
-                                }`}
-                        >
-                            Todos {type === 'idol' ? 'Ídolos' : 'Atores'}
-                        </Link>
-                        {visibleGroups.map((group) => (
-                            <Link
-                                key={group.id}
-                                href={`/community?type=${type}&category=${group.id}`}
-                                className={`rounded-full px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${categoryId === group.id
-                                    ? 'bg-white text-black'
-                                    : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'
-                                    }`}
-                            >
-                                {group.name}
-                            </Link>
-                        ))}
-                    </div>
-                </div>
+                <GroupSelector
+                    groups={visibleGroups}
+                    type={type as 'idol' | 'actor'}
+                    activeCategoryId={categoryId}
+                />
             )}
 
             {/* 4. Feed */}
@@ -180,7 +161,7 @@ function PostCard({ post, highlight = false, groups = [] }: { post: Post & { gro
                 </div>
                 {post.group && (
                     <Link
-                        href={`/community?category=${post.group.id}`}
+                        href={`/community?category=${post.group.id}&type=${post.group.type}`}
                         className="ml-auto rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent hover:bg-accent/20 transition-colors relative z-10"
                     >
                         {post.group.name}

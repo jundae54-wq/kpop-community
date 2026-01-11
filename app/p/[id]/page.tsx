@@ -146,7 +146,7 @@ export default async function PostPage(props: Props) {
                                     <BadgeRenderer badgeId={`badge_${post.group.id}`} groups={groups || []} variant="gold" />
                                 )}
                                 <BadgeRenderer badgeId={post.author?.badge_left} groups={groups || []} />
-                                <p className={`text-white font-medium px-1 ${post.author && 'active_effect' in post.author && post.author.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>
+                                <p className={`text-white font-medium px-1 ${post.author?.active_effect || ''}`}>
                                     {!post.group ? 'K-Community Bot' : (post.author?.full_name || 'Anônimo')}
                                 </p>
                                 <BadgeRenderer badgeId={post.author?.badge_right} groups={groups || []} />
@@ -222,7 +222,7 @@ export default async function PostPage(props: Props) {
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <div className="flex items-center">
                                                 <BadgeRenderer badgeId={comment.author?.badge_left} groups={groups || []} />
-                                                <span className={`font-semibold text-white text-sm px-1 ${comment.author && 'active_effect' in comment.author && comment.author.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>{comment.author?.full_name || 'User'}</span>
+                                                <span className={`font-semibold text-white text-sm px-1 ${comment.author?.active_effect || ''}`}>{comment.author?.full_name || 'User'}</span>
                                                 <BadgeRenderer badgeId={comment.author?.badge_right} groups={groups || []} />
                                             </div>
                                             <span className="text-xs text-zinc-500">{new Date(comment.created_at).toLocaleDateString()}</span>

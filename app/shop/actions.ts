@@ -13,11 +13,19 @@ export async function buyItem(formData: FormData) {
 
     // Item Definitions
     // Static items
-    const ITEMS: Record<string, { price: number; name: string; type: 'effect' | 'badge' }> = {
-        'shiny_nickname': { price: 100, name: 'Shiny Nickname', type: 'effect' }
+    // Item Definitions
+    // Static items
+    const ITEMS: Record<string, { price: number; name: string; type: 'effect' | 'badge' | 'consumable_effect' }> = {
+        'shiny_nickname': { price: 100, name: 'Shiny Nickname', type: 'effect' },
+        'nick-red': { price: 30, name: 'Nome Vermelho', type: 'consumable_effect' },
+        'nick-blue': { price: 30, name: 'Nome Azul', type: 'consumable_effect' },
+        'nick-green': { price: 30, name: 'Nome Verde', type: 'consumable_effect' },
+        'nick-pink': { price: 30, name: 'Nome Rosa', type: 'consumable_effect' },
+        'nick-purple': { price: 30, name: 'Nome Roxo', type: 'consumable_effect' },
+        'nick-gold': { price: 100, name: 'Nome Dourado', type: 'consumable_effect' },
     }
 
-    let item: { price: number; name: string; type: 'effect' | 'badge' } | undefined = ITEMS[itemType]
+    let item: { price: number; name: string; type: 'effect' | 'badge' | 'consumable_effect' } | undefined = ITEMS[itemType]
     let dbItemType = item?.type || 'badge' // Default to badge if dynamic
 
     // Dynamic Badges (Check if itemType starts with 'badge_')
@@ -73,25 +81,27 @@ export async function buyItem(formData: FormData) {
     }
 
     // 2. Check if already owned (for unique items like badges/effects)
-    // You can buy duplicates if we want, but for badges maybe limit to 1? 
-    // Let's limit 1 for now to prevent accidental double purchase.
-    const { data: owned } = await supabase
-        .from('user_inventory')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('item_id', itemType)
-        .single()
+    // SKIP this check for 'consumable_effect'
+    const isConsumable = dbItemType === 'consumable_effect'
 
-    if (owned) {
-        redirect('/shop?error=Item já adquirido')
+    if (!isConsumable) {
+        const { data: owned } = await supabase
+            .from('user_inventory')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('item_id', itemType)
+            .single()
+
+        if (owned) {
+            redirect('/shop?error=Item já adquirido')
+        }
     }
 
     // 3. Transaction (Deduct Points & Add to Inventory)
-    // Note: Ideally use a stored procedure for atomicity, but individual calls are ok for MVP
     const { error: updateError } = await supabase.from('profiles').update({
         points: (profile.points || 0) - item.price,
-        // Also auto-equip active effect if it's an effect type (legacy behavior support)
-        ...(dbItemType === 'effect' ? { active_effect: itemType } : {})
+        // Auto-equip if it's a consumable effect OR standard effect (legacy support)
+        ...(isConsumable || dbItemType === 'effect' ? { active_effect: itemType } : {})
     }).eq('id', user.id)
 
     if (updateError) {
@@ -99,23 +109,26 @@ export async function buyItem(formData: FormData) {
         redirect('/shop?error=Falha na compra')
     }
 
-    const { error: insertError } = await supabase.from('user_inventory').insert({
-        user_id: user.id,
-        item_id: itemType,
-        item_type: dbItemType,
-    })
+    // Insert into inventory ONLY if NOT consumable
+    if (!isConsumable) {
+        const { error: insertError } = await supabase.from('user_inventory').insert({
+            user_id: user.id,
+            item_id: itemType,
+            item_type: dbItemType,
+        })
 
-    if (insertError) {
-        // Rollback points (best effort)
-        console.error('Purchase failed (inventory insert):', insertError)
-        await supabase.from('profiles').update({
-            points: (profile.points || 0) // Restore
-        }).eq('id', user.id)
-        redirect('/shop?error=Falha na compra')
+        if (insertError) {
+            // Rollback points (best effort)
+            console.error('Purchase failed (inventory insert):', insertError)
+            await supabase.from('profiles').update({
+                points: (profile.points || 0) // Restore
+            }).eq('id', user.id)
+            redirect('/shop?error=Falha na compra')
+        }
     }
 
     revalidatePath('/', 'layout')
-    redirect('/shop?success=Item comprado com sucesso!')
+    redirect(isConsumable ? '/shop?success=Cor do nome alterada!' : '/shop?success=Item comprado com sucesso!')
 }
 
 export async function equipBadge(formData: FormData) {

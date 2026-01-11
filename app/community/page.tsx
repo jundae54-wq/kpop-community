@@ -150,7 +150,7 @@ function PostCard({ post, highlight = false, groups = [] }: { post: Post & { gro
                         )}
 
                         <BadgeRenderer badgeId={post.author?.badge_left} groups={groups} />
-                        <p className={`text-sm font-medium text-white px-1 ${post.author?.active_effect === 'shiny_nickname' ? 'shiny-text' : ''}`}>
+                        <p className={`text-sm font-medium text-white px-1 ${post.author?.active_effect || ''}`}>
                             {post.author?.full_name || 'Anônimo'}
                         </p>
                         <BadgeRenderer badgeId={post.author?.badge_right} groups={groups} />

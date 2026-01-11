@@ -85,3 +85,15 @@ export async function adminDeleteComment(formData: FormData) {
 
     revalidatePath('/admin/comments')
 }
+
+export async function bulkDeletePosts(postIds: string[]) {
+    await checkAdmin()
+    const admin = createAdminClient()
+
+    if (!postIds || postIds.length === 0) return
+
+    const { error } = await admin.from('posts').delete().in('id', postIds)
+    if (error) console.error('Bulk delete failed:', error)
+
+    revalidatePath('/admin/posts')
+}

@@ -47,6 +47,7 @@ export default async function AdminUsersPage() {
                         <tr>
                             <th className="p-4 font-medium">User</th>
                             <th className="p-4 font-medium">Joined</th>
+                            <th className="p-4 font-medium">Last Login</th>
                             <th className="p-4 font-medium">Status</th>
                             <th className="p-4 font-medium text-right">Actions</th>
                         </tr>
@@ -72,6 +73,9 @@ export default async function AdminUsersPage() {
                                     </td>
                                     <td className="p-4 text-zinc-400">
                                         {new Date(u.created_at).toLocaleDateString()}
+                                    </td>
+                                    <td className="p-4 text-zinc-400">
+                                        {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString() : 'Never'}
                                     </td>
                                     <td className="p-4">
                                         {isBanned ? (

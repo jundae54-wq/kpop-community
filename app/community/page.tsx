@@ -106,9 +106,20 @@ export default async function CommunityPage(props: {
             )}
 
             {/* 4. Feed */}
-            <h3 className="text-white font-bold mb-4">
-                {categoryId ? 'Posts do Grupo' : type ? `Posts de ${type === 'idol' ? 'Ídolos' : 'Atores'}` : 'Posts Recentes'}
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-white font-bold">
+                    {categoryId ? 'Posts do Grupo' : type ? `Posts de ${type === 'idol' ? 'Ídolos' : 'Atores'}` : 'Posts Recentes'}
+                </h3>
+                <Link
+                    href={categoryId ? `/write?group_id=${categoryId}` : '/write'}
+                    className="flex items-center gap-2 bg-brand text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-brand/90 transition-colors shadow-lg shadow-brand/20"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                        <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                    </svg>
+                    Escrever
+                </Link>
+            </div>
             <div className="space-y-6">
                 {(!filteredPosts || filteredPosts.length === 0) ? (
                     <EmptyState categoryId={categoryId} />

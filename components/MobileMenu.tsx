@@ -70,6 +70,9 @@ export default function MobileMenu({ dict, user, points }: MobileMenuProps) {
                             <Link href="/write" onClick={close} className="block text-xl font-bold text-zinc-300 hover:text-white">
                                 {dict.navbar.write}
                             </Link>
+                            <Link href="/messages" onClick={close} className="block text-xl font-bold text-zinc-300 hover:text-white">
+                                Avisos/Mensagens
+                            </Link>
                             <Link href="/install" onClick={close} className="block text-xl font-medium text-brand hover:text-brand/80">
                                 Instalar App
                             </Link>

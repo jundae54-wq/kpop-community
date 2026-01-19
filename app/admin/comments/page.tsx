@@ -2,6 +2,7 @@ import { createAdminClient } from '@/utils/supabase/admin'
 import Link from 'next/link'
 import { adminDeleteComment } from '../admin-actions'
 import { ConfirmDeleteButton } from '@/components/admin/ConfirmDeleteButton'
+import AdminCommentList from './AdminCommentList'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,48 +28,7 @@ export default async function AdminCommentsPage() {
     return (
         <div>
             <h1 className="text-2xl font-bold text-white mb-6">Recent Comments</h1>
-            <div className="rounded-xl border border-white/10 bg-zinc-900/50 overflow-hidden overflow-x-auto">
-                <table className="w-full text-left text-sm min-w-[800px]">
-                    <thead className="bg-white/5 text-zinc-400">
-                        <tr>
-                            <th className="p-4 font-medium w-1/2">Content</th>
-                            <th className="p-4 font-medium">Author</th>
-                            <th className="p-4 font-medium">Post/Group</th>
-                            <th className="p-4 font-medium text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                        {comments?.map((comment) => (
-                            <tr key={comment.id} className="hover:bg-white/5 transition-colors">
-                                <td className="p-4">
-                                    <div className="text-white line-clamp-2">{comment.content}</div>
-                                    <div className="text-xs text-zinc-500 mt-1">
-                                        {new Date(comment.created_at).toLocaleString()}
-                                    </div>
-                                </td>
-                                <td className="p-4 text-zinc-300">
-                                    {comment.author?.full_name || 'Unknown'}
-                                </td>
-                                <td className="p-4">
-                                    <div className="text-zinc-400 text-xs">
-                                        on <Link href={`/p/${comment.post_id}`} className="text-zinc-300 hover:text-white underline">{comment.post?.title}</Link>
-                                    </div>
-                                    <div className="text-zinc-500 text-[10px] mt-0.5">
-                                        in {comment.post?.group?.name || 'General'}
-                                    </div>
-                                </td>
-                                <td className="p-4 text-right">
-                                    <ConfirmDeleteButton
-                                        action={adminDeleteComment}
-                                        itemId={comment.id}
-                                        itemType="comment"
-                                    />
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            <AdminCommentList initialComments={comments} />
         </div>
     )
 }

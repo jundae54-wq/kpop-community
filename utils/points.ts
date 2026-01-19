@@ -74,3 +74,28 @@ export async function checkAndAwardDailyLoginBonus(userId: string) {
         console.log(`Daily bonus already collected for ${userId}`)
     }
 }
+
+export async function deductPoints(userId: string, amount: number): Promise<boolean> {
+    const supabase = await createClient()
+
+    // Check balance first
+    const { data: profile } = await supabase.from('profiles').select('points').eq('id', userId).single()
+
+    if (!profile || (profile.points || 0) < amount) {
+        return false // Insufficient funds
+    }
+
+    const newPoints = (profile.points || 0) - amount
+
+    const { error } = await supabase
+        .from('profiles')
+        .update({ points: newPoints })
+        .eq('id', userId)
+
+    if (error) {
+        console.error('Error deducting points:', error)
+        return false
+    }
+
+    return true
+}

@@ -3,6 +3,7 @@ import { BadgeRenderer } from '@/components/BadgeRenderer'
 import { Post } from '@/types/database'
 import Link from 'next/link'
 import GroupSelector from '@/components/GroupSelector'
+import MessageManagerButton from '@/components/MessageManagerButton'
 
 export default async function CommunityPage(props: {
     searchParams: Promise<{ type?: string; category?: string }>
@@ -103,6 +104,11 @@ export default async function CommunityPage(props: {
                     type={type as 'idol' | 'actor'}
                     activeCategoryId={categoryId}
                 />
+            )}
+
+            {/* 3.5 Manager Info (If Category Selected) */}
+            {categoryId && (
+                <ManagerInfoSection categoryId={categoryId} />
             )}
 
             {/* 4. Feed */}

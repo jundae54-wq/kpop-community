@@ -5,9 +5,30 @@ import { ConfirmDeleteButton } from '@/components/admin/ConfirmDeleteButton'
 
 export const dynamic = 'force-dynamic'
 
-export default async function AdminUsersPage() {
+export default async function AdminUsersPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ filter?: string }>
+}) {
     const supabaseAdmin = createAdminClient()
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers()
+    const { filter } = await searchParams
+
+    // Construct query
+    // Supabase Auth API doesn't support complex filtering (like join with other tables) directly easily.
+    // So we fetch profiles/moderators first if filtering, then filter the user list?
+    // Or just fetch all users (limit 50-100) and filter in memory for MVP?
+    // Since listUsers pagination is tricky without next_page_token, we'll assume <1000 users for now.
+
+    // Fetch moderators first if needed
+    let moderatorUserIds: Set<string> | null = null
+    if (filter === 'managers') {
+        const { data: mods } = await supabaseAdmin.from('group_moderators').select('user_id')
+        if (mods) {
+            moderatorUserIds = new Set(mods.map(m => m.user_id))
+        }
+    }
+
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
 
     if (error || !data) {
         console.error('Failed to list users:', error)
@@ -31,16 +52,41 @@ export default async function AdminUsersPage() {
     const profileMap = new Map(profiles?.map(p => [p.id, p]))
 
     // Fetch moderators
+    // Fetch moderators (always need map for displaying, but also for filtering)
     const { data: moderators } = await supabaseAdmin.from('group_moderators').select('*')
     const moderatorMap = new Map()
+    const allModeratorIds = new Set<string>()
+
     moderators?.forEach(m => {
         if (!moderatorMap.has(m.user_id)) moderatorMap.set(m.user_id, [])
         moderatorMap.get(m.user_id).push(m.group_id)
+        allModeratorIds.add(m.user_id)
     })
+
+    let displayedUsers = users
+    if (filter === 'managers') {
+        displayedUsers = users?.filter(u => allModeratorIds.has(u.id)) || []
+    }
 
     return (
         <div>
-            <h1 className="text-2xl font-bold text-white mb-6">User Management</h1>
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold text-white">User Management</h1>
+                <div className="flex gap-2 bg-zinc-900 p-1 rounded-lg border border-white/10">
+                    <Link
+                        href="/admin/users"
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${!filter ? 'bg-brand text-white shadow-lg' : 'text-zinc-400 hover:text-white'}`}
+                    >
+                        All Users
+                    </Link>
+                    <Link
+                        href="/admin/users?filter=managers"
+                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${filter === 'managers' ? 'bg-brand text-white shadow-lg' : 'text-zinc-400 hover:text-white'}`}
+                    >
+                        Managers Only
+                    </Link>
+                </div>
+            </div>
             <div className="rounded-xl border border-white/10 bg-zinc-900/50 overflow-hidden overflow-x-auto">
                 <table className="w-full text-left text-sm min-w-[800px]">
                     <thead className="bg-white/5 text-zinc-400">
@@ -53,7 +99,7 @@ export default async function AdminUsersPage() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
-                        {users?.map((u) => {
+                        {displayedUsers?.map((u) => {
                             const profile = profileMap.get(u.id)
                             const isBanned = u.ban_duration && u.ban_duration !== 'none' && u.ban_duration !== '0'
 

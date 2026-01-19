@@ -7,6 +7,7 @@ import ViewTracker from '@/components/ViewTracker'
 import { BadgeRenderer } from '@/components/BadgeRenderer'
 import { SubmitButton } from '@/components/SubmitButton'
 import { PostActions } from '@/components/PostActions'
+import ReportButton from '@/components/ReportButton'
 
 type Props = {
     params: Promise<{ id: string }>
@@ -227,15 +228,22 @@ export default async function PostPage(props: Props) {
                                             </div>
                                             <span className="text-xs text-zinc-500">{new Date(comment.created_at).toLocaleDateString()}</span>
                                         </div>
-                                        {canDeleteComment && (
-                                            <form action={deleteComment} className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <input type="hidden" name="commentId" value={comment.id} />
-                                                <input type="hidden" name="postId" value={post.id} />
-                                                <button className="text-xs text-red-500 hover:text-red-400">
-                                                    Excluir
-                                                </button>
-                                            </form>
-                                        )}
+                                        <div className="flex items-center gap-2">
+                                            {canDeleteComment && (
+                                                <form action={deleteComment} className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <input type="hidden" name="commentId" value={comment.id} />
+                                                    <input type="hidden" name="postId" value={post.id} />
+                                                    <button className="text-xs text-red-500 hover:text-red-400">
+                                                        Excluir
+                                                    </button>
+                                                </form>
+                                            )}
+                                            {!canDeleteComment && (
+                                                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <ReportButton targetType="comment" targetId={comment.id} iconOnly />
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                     <p className="text-zinc-300 mt-1 text-sm">{comment.content}</p>
                                 </div>

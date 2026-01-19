@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { toggleLike, togglePin } from '@/app/actions/post-interactions'
 import { useRouter } from 'next/navigation'
+import ReportButton from './ReportButton'
 
 interface PostActionsProps {
     postId: number
@@ -105,6 +106,11 @@ export function PostActions({ postId, initialLikes, initialIsLiked, isPinned, ca
                     <span className="text-sm font-bold">{isPinnedState ? 'Desafixar' : 'Fixar Global'}</span>
                 </button>
             )}
+
+            {/* Report Button - Independent placement */}
+            <div className={canPin ? 'ml-2' : 'ml-auto'}>
+                <ReportButton targetType="post" targetId={postId} iconOnly />
+            </div>
         </div>
     )
-}
+        ```

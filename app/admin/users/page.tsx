@@ -65,7 +65,7 @@ export default async function AdminUsersPage({
 
     let displayedUsers = users
     if (filter === 'managers') {
-        displayedUsers = users?.filter(u => allModeratorIds.has(u.id)) || []
+        displayedUsers = users?.filter((u: any) => allModeratorIds.has(u.id)) || []
     }
 
     return (

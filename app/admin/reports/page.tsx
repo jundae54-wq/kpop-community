@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { resolveReport } from '@/app/actions/reporting'
 import { createClient } from '@/utils/supabase/server'
 
@@ -163,10 +163,10 @@ function ReportActionForm({ reportId, action, label, targetType, targetId, isDes
         }}>
             <button
                 className={`px-3 py-1.5 rounded text-xs font-bold transition-colors ${isDestructive
-                        ? 'bg-red-500 text-white hover:bg-red-600'
-                        : action === 'hide'
-                            ? 'bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20'
-                            : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'
+                    ? 'bg-red-500 text-white hover:bg-red-600'
+                    : action === 'hide'
+                        ? 'bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20'
+                        : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'
                     }`}
             >
                 {label}

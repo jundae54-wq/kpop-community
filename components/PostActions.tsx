@@ -113,4 +113,4 @@ export function PostActions({ postId, initialLikes, initialIsLiked, isPinned, ca
             </div>
         </div>
     )
-        ```
+}

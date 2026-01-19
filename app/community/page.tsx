@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { BadgeRenderer } from '@/components/BadgeRenderer'
 import { Post } from '@/types/database'
 import Link from 'next/link'
@@ -248,22 +249,42 @@ async function ManagerInfoSection({ categoryId }: { categoryId: number }) {
         .eq('id', categoryId)
         .single()
 
-    const moderator = group?.group_moderators?.[0]?.user
+    let activeManager = group?.group_moderators?.[0]?.user
+    let title = 'Gerente do Grupo'
 
-    if (!moderator) return null
+    if (!activeManager) {
+        // Fallback to Global Admin
+        const supabaseAdmin = createAdminClient()
+        // We need to find the user ID for jundae54@gmail.com
+        // Since we can't easily query by email in a performant way without an index or knowing the ID,
+        // and listUsers() might be heavy if many users...
+        // But for this app size it's fine.
+        const { data: { users } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
+        const adminUser = users?.find((u: any) => u.email === 'jundae54@gmail.com')
+
+        if (adminUser) {
+            const { data: adminProfile } = await supabase.from('profiles').select('*').eq('id', adminUser.id).single()
+            if (adminProfile) {
+                activeManager = adminProfile
+                title = 'Admin Global'
+            }
+        }
+    }
+
+    if (!activeManager) return null
 
     return (
         <div className="mb-8 p-4 rounded-xl border border-brand/20 bg-brand/5 flex items-center justify-between">
             <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-zinc-800 overflow-hidden border border-brand/30">
-                    {moderator.avatar_url && <img src={moderator.avatar_url} alt="" className="h-full w-full object-cover" />}
+                    {activeManager.avatar_url && <img src={activeManager.avatar_url} alt="" className="h-full w-full object-cover" />}
                 </div>
                 <div>
-                    <div className="text-xs text-brand font-bold uppercase tracking-wider">Gerente do Grupo</div>
-                    <div className="text-white font-bold text-sm">{moderator.full_name}</div>
+                    <div className="text-xs text-brand font-bold uppercase tracking-wider">{title}</div>
+                    <div className="text-white font-bold text-sm">{activeManager.full_name || 'Admin'}</div>
                 </div>
             </div>
-            <MessageManagerButton managerId={moderator.id} managerName={moderator.full_name || 'Gerente'} />
+            <MessageManagerButton managerId={activeManager.id} managerName={activeManager.full_name || 'Admin'} />
         </div>
     )
 }

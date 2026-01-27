@@ -46,21 +46,23 @@ export default async function CommunityPage(props: {
         .select(`
             *, 
             author:profiles(id, full_name, active_effect, badge_left, badge_right, avatar_url), 
-            group:groups(*, group_moderators(user_id)), 
+            group:groups!inner(*, group_moderators(user_id)), 
             comments:comments(count)
         `)
         .not('group_id', 'is', null)
         .order('is_pinned', { ascending: false })
         .order('created_at', { ascending: false })
+        .limit(30) // Pagination limit
+
+    if (categoryId) {
+        query = query.eq('group_id', categoryId)
+    } else if (type) {
+        // Filter by group type using !inner join
+        query = query.eq('group.type', type)
+    }
 
     const { data: posts } = await query
-
-    // Filter in memory for MVP
-    const filteredPosts = posts?.filter((p: any) => {
-        if (categoryId) return p.group_id === categoryId
-        if (type) return p.group?.type === type
-        return true
-    }) || []
+    const filteredPosts = posts || []
 
     return (
         <div className="mx-auto max-w-2xl py-8 px-4">

@@ -3,6 +3,7 @@ import { createAdminClient } from '@/utils/supabase/admin'
 import { BadgeRenderer } from '@/components/BadgeRenderer'
 import { Post } from '@/types/database'
 import Link from 'next/link'
+import { unstable_cache } from 'next/cache'
 import GroupSelector from '@/components/GroupSelector'
 import MessageManagerButton from '@/components/MessageManagerButton'
 
@@ -256,13 +257,18 @@ async function ManagerInfoSection({ categoryId }: { categoryId: number }) {
 
     if (!activeManager) {
         // Fallback to Global Admin
-        const supabaseAdmin = createAdminClient()
-        // We need to find the user ID for jundae54@gmail.com
-        // Since we can't easily query by email in a performant way without an index or knowing the ID,
-        // and listUsers() might be heavy if many users...
-        // But for this app size it's fine.
-        const { data: { users } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
-        const adminUser = users?.find((u: any) => u.email === 'jundae54@gmail.com')
+        // Cached lookup to prevent slow listUsers call on every request
+        const getAdminUser = unstable_cache(
+            async () => {
+                const supabaseAdmin = createAdminClient()
+                const { data: { users } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
+                return users?.find((u: any) => u.email === 'jundae54@gmail.com')
+            },
+            ['admin-user-lookup'],
+            { revalidate: 3600 } // Cache for 1 hour
+        )
+
+        const adminUser = await getAdminUser()
 
         if (adminUser) {
             const { data: adminProfile } = await supabase.from('profiles').select('*').eq('id', adminUser.id).single()

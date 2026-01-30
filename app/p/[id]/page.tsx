@@ -14,6 +14,7 @@ type Props = {
 }
 
 const ADMIN_EMAIL = 'jundae54@gmail.com'
+export const revalidate = 60 // Cache posts for 60 seconds
 
 export async function generateMetadata(
     props: Props,

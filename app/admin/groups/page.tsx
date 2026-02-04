@@ -15,7 +15,6 @@ export default async function AdminGroupsPage() {
                 user:profiles(
                     id,
                     full_name,
-                    username,
                     avatar_url
                 )
             )

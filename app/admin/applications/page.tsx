@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { reviewApplication } from './actions'
 import Link from 'next/link'
+import { SubmitButton } from '@/components/SubmitButton'
 
 export default async function AdminApplicationsPage() {
     const supabase = await createClient()
@@ -58,12 +59,11 @@ export default async function AdminApplicationsPage() {
                                 }}>
                                     <input type="hidden" name="applicationId" value={app.id} />
                                     <input type="hidden" name="action" value="reject" />
-                                    <button
-                                        type="submit"
+                                    <SubmitButton
                                         className="px-4 py-2 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 text-sm font-medium transition-colors"
                                     >
                                         Rejeitar
-                                    </button>
+                                    </SubmitButton>
                                 </form>
                                 <form action={async (formData) => {
                                     'use server'
@@ -71,12 +71,11 @@ export default async function AdminApplicationsPage() {
                                 }}>
                                     <input type="hidden" name="applicationId" value={app.id} />
                                     <input type="hidden" name="action" value="approve" />
-                                    <button
-                                        type="submit"
+                                    <SubmitButton
                                         className="px-4 py-2 rounded-lg bg-brand text-white hover:bg-brand/90 text-sm font-bold shadow-lg shadow-brand/20 transition-colors"
                                     >
                                         Aprovar & Tornar Gerente
-                                    </button>
+                                    </SubmitButton>
                                 </form>
                             </div>
                         </div>

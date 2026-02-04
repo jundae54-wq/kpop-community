@@ -63,7 +63,7 @@ export default async function LoginPage(props: {
                     <div>
                         <button
                             formAction={login}
-                            className="group relative flex w-full justify-center rounded-lg bg-brand px-3 py-3 text-sm font-semibold text-white hover:bg-brand/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand transition-all duration-200"
+                            className="group relative flex w-full justify-center rounded-xl bg-gradient-to-br from-brand to-pink-600 px-3 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand/30 hover:shadow-brand/50 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand transition-all duration-200"
                         >
                             Entrar
                         </button>

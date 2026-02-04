@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { unstable_cache } from 'next/cache'
 import GroupSelector from '@/components/GroupSelector'
 import MessageManagerButton from '@/components/MessageManagerButton'
+import ApplyManagerButton from '@/components/ApplyManagerButton'
 
 export default async function CommunityPage(props: {
     searchParams: Promise<{ type?: string; category?: string }>
@@ -241,6 +242,8 @@ function EmptyState({ categoryId }: { categoryId: number | null }) {
 
 async function ManagerInfoSection({ categoryId }: { categoryId: number }) {
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
     const { data: group } = await supabase
         .from('groups')
         .select(`
@@ -254,8 +257,9 @@ async function ManagerInfoSection({ categoryId }: { categoryId: number }) {
 
     let activeManager = group?.group_moderators?.[0]?.user
     let title = 'Gerente do Grupo'
+    const isFallbackAdmin = !activeManager
 
-    if (!activeManager) {
+    if (isFallbackAdmin) {
         // Fallback to Global Admin
         // Cached lookup to prevent slow listUsers call on every request
         const getAdminUser = unstable_cache(
@@ -279,6 +283,19 @@ async function ManagerInfoSection({ categoryId }: { categoryId: number }) {
         }
     }
 
+    // Check if current user has pending application
+    let hasPending = false
+    if (user && isFallbackAdmin) {
+        const { data: app } = await supabase
+            .from('manager_applications')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('group_id', categoryId)
+            .eq('status', 'pending')
+            .single()
+        if (app) hasPending = true
+    }
+
     if (!activeManager) return null
 
     return (
@@ -292,7 +309,17 @@ async function ManagerInfoSection({ categoryId }: { categoryId: number }) {
                     <div className="text-white font-bold text-sm">{activeManager.full_name || 'Admin'}</div>
                 </div>
             </div>
-            <MessageManagerButton managerId={activeManager.id} managerName={activeManager.full_name || 'Admin'} />
+
+            <div className="flex items-center gap-2">
+                {isFallbackAdmin && user && (
+                    <ApplyManagerButton
+                        groupId={categoryId}
+                        groupName={group?.name}
+                        hasPending={hasPending}
+                    />
+                )}
+                <MessageManagerButton managerId={activeManager.id} managerName={activeManager.full_name || 'Admin'} />
+            </div>
         </div>
     )
 }

@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
+import { redirect, isRedirectError } from 'next/navigation'
 import { headers } from 'next/headers'
 import { createClient } from '@/utils/supabase/server'
 import { incrementPoints, checkAndAwardDailyLoginBonus } from '@/utils/points'
@@ -102,8 +102,8 @@ export async function signup(formData: FormData) {
         // But for verified users trying to signup again, Supabase usually returns an error or fake success.
 
     } catch (e: any) {
-        if (e?.message?.includes('NEXT_REDIRECT')) {
-            throw e // Let Next.js redirect handle it
+        if (isRedirectError(e)) {
+            throw e
         }
         console.error('Unexpected signup error:', e)
         redirect('/signup?error=' + encodeURIComponent('Algo deu errado. Tente novamente.'))

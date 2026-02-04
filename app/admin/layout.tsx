@@ -55,6 +55,12 @@ export default async function AdminLayout({
                         <Link href="/admin/comments" className="block px-3 py-2 text-sm font-medium rounded-md text-zinc-300 bg-zinc-800/50 lg:bg-transparent hover:text-white hover:bg-zinc-800 transition-colors text-center lg:text-left">
                             Comments
                         </Link>
+                        <Link href="/admin/applications" className="block px-3 py-2 text-sm font-medium rounded-md text-zinc-300 bg-zinc-800/50 lg:bg-transparent hover:text-white hover:bg-zinc-800 transition-colors text-center lg:text-left">
+                            Applications (Gerentes)
+                        </Link>
+                        <Link href="/admin/groups" className="block px-3 py-2 text-sm font-medium rounded-md text-zinc-300 bg-zinc-800/50 lg:bg-transparent hover:text-white hover:bg-zinc-800 transition-colors text-center lg:text-left">
+                            Groups
+                        </Link>
                     </nav>
                 </div>
             </aside>

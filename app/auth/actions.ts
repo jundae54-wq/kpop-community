@@ -23,10 +23,16 @@ export async function login(formData: FormData) {
 
     if (data.user) {
         // Daily Login Bonus
-        await checkAndAwardDailyLoginBonus(data.user.id)
+        // Returns true if awarded
+        const bonusAwarded = await checkAndAwardDailyLoginBonus(data.user.id)
 
         revalidatePath('/', 'layout')
-        redirect('/')
+
+        if (bonusAwarded) {
+            redirect('/?reward=10')
+        } else {
+            redirect('/')
+        }
     }
 
 }

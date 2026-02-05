@@ -70,8 +70,10 @@ export async function checkAndAwardDailyLoginBonus(userId: string) {
             .eq('id', userId)
 
         console.log(`Awarded daily login bonus to ${userId}`)
+        return true
     } else {
         console.log(`Daily bonus already collected for ${userId}`)
+        return false
     }
 }
 

@@ -1,7 +1,6 @@
-'use server'
-
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { createAdminClient } from '@/utils/supabase/admin'
 
 export async function reviewCategoryRequest(formData: FormData) {
     const supabase = await createClient()
@@ -12,6 +11,9 @@ export async function reviewCategoryRequest(formData: FormData) {
         return { error: 'Unauthorized' }
     }
 
+    // Use Service Role client for DB operations to bypass RLS
+    const adminSupabase = createAdminClient()
+
     const requestId = formData.get('requestId')
     const action = formData.get('action') // 'approve' | 'reject'
 
@@ -20,7 +22,7 @@ export async function reviewCategoryRequest(formData: FormData) {
     }
 
     if (action === 'reject') {
-        const { error } = await supabase
+        const { error } = await adminSupabase
             .from('category_requests')
             .update({ status: 'rejected' })
             .eq('id', requestId)
@@ -28,7 +30,7 @@ export async function reviewCategoryRequest(formData: FormData) {
         if (error) return { error: 'Failed to reject' }
     } else if (action === 'approve') {
         // 1. Get request details
-        const { data: req } = await supabase
+        const { data: req } = await adminSupabase
             .from('category_requests')
             .select('*')
             .eq('id', requestId)
@@ -37,7 +39,7 @@ export async function reviewCategoryRequest(formData: FormData) {
         if (!req) return { error: 'Request not found' }
 
         // 2. Create Group
-        const { error: createError } = await supabase
+        const { error: createError } = await adminSupabase
             .from('groups')
             .insert({
                 name: req.name,
@@ -50,7 +52,7 @@ export async function reviewCategoryRequest(formData: FormData) {
         }
 
         // 3. Update request status
-        const { error: updateError } = await supabase
+        const { error: updateError } = await adminSupabase
             .from('category_requests')
             .update({ status: 'approved' })
             .eq('id', requestId)

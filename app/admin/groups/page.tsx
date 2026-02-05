@@ -1,11 +1,20 @@
 import { createClient } from '@/utils/supabase/server'
-import { BadgeRenderer } from '@/components/BadgeRenderer'
+import { createAdminClient } from '@/utils/supabase/admin'
+import { redirect } from 'next/navigation'
 
 export default async function AdminGroupsPage() {
     const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user || user.email !== 'jundae54@gmail.com') {
+        redirect('/')
+    }
+
+    // Use Admin Client to fetch all groups + managers, bypassing RLS
+    const adminSupabase = createAdminClient()
 
     // Fetch all groups with their managers
-    const { data: groups } = await supabase
+    const { data: groups, error } = await adminSupabase
         .from('groups')
         .select(`
             id,
@@ -20,6 +29,11 @@ export default async function AdminGroupsPage() {
             )
         `)
         .order('name')
+
+    if (error) {
+        console.error('Groups Fetch Error:', error)
+        return <div className="p-6 text-red-500">Erro ao carregar grupos: {error.message}</div>
+    }
 
     return (
         <div className="max-w-4xl mx-auto p-6">

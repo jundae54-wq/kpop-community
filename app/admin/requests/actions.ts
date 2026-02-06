@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/utils/supabase/admin'
 
 export async function reviewCategoryRequest(formData: FormData) {
@@ -57,10 +58,14 @@ export async function reviewCategoryRequest(formData: FormData) {
             .update({ status: 'approved' })
             .eq('id', requestId)
 
-        if (updateError) return { error: 'Failed to update status' }
+        if (updateError) {
+             console.error('Update Request Error:', updateError)
+             redirect('/admin/requests?error=' + encodeURIComponent('Falha ao atualizar status'))
+        }
     }
 
     revalidatePath('/admin/requests')
-    revalidatePath('/community') // Update selector list
-    return { success: true }
+    revalidatePath('/community') 
+    
+    redirect('/admin/requests?success=true')
 }

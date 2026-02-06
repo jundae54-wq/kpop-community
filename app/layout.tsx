@@ -42,6 +42,9 @@ export const metadata: Metadata = {
   }
 };
 
+import { Toaster } from 'react-hot-toast'
+import { RewardToast } from '@/components/RewardToast'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -69,6 +72,14 @@ export default function RootLayout({
         <PWARegister />
         <Navbar />
         {children}
+        <Toaster position="bottom-center" toastOptions={{
+          style: {
+            background: '#333',
+            color: '#fff',
+            border: '1px solid #444'
+          }
+        }} />
+        <RewardToast />
       </body>
     </html>
   );

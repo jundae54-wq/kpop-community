@@ -1,6 +1,9 @@
 import { createClient } from '@/utils/supabase/server'
 import { reviewCategoryRequest } from './actions'
 import { SubmitButton } from '@/components/SubmitButton'
+import { AdminToastListener } from '@/components/AdminToastListener'
+
+export const dynamic = 'force-dynamic'
 
 export default async function AdminRequestsPage() {
     const supabase = await createClient()
@@ -17,6 +20,7 @@ export default async function AdminRequestsPage() {
 
     return (
         <div className="max-w-4xl mx-auto p-6">
+            <AdminToastListener />
             <h1 className="text-2xl font-bold text-white mb-6">Solicitações de Novas Categorias</h1>
 
             <div className="space-y-4">

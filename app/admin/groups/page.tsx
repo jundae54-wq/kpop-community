@@ -1,6 +1,10 @@
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { redirect } from 'next/navigation'
+import { removeManager } from './actions'
+import { SubmitButton } from '@/components/SubmitButton'
+
+export const dynamic = 'force-dynamic'
 
 export default async function AdminGroupsPage() {
     const supabase = await createClient()
@@ -65,6 +69,18 @@ export default async function AdminGroupsPage() {
                                             <p className="text-sm text-white font-medium line-clamp-1">{manager.full_name}</p>
                                             <p className="text-[10px] text-zinc-500">Gerente</p>
                                         </div>
+                                        <form action={async (formData) => {
+                                            'use server'
+                                            await removeManager(formData)
+                                        }}>
+                                            <input type="hidden" name="groupId" value={group.id} />
+                                            <input type="hidden" name="userId" value={manager.id} />
+                                            <SubmitButton className="ml-2 p-1 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded transition-colors">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </SubmitButton>
+                                        </form>
                                     </div>
                                 ) : (
                                     <span className="text-zinc-600 text-sm font-medium italic px-3">

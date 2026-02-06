@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { redirect } from 'next/navigation'
-import { removeManager } from './actions'
+import { removeManager, deleteGroup } from './actions'
 import { SubmitButton } from '@/components/SubmitButton'
 
 export const dynamic = 'force-dynamic'
@@ -87,6 +87,20 @@ export default async function AdminGroupsPage() {
                                         Vago (Admin Global)
                                     </span>
                                 )}
+
+                                <div className="h-8 w-px bg-zinc-800 mx-2"></div>
+
+                                <form action={async (formData) => {
+                                    'use server'
+                                    await deleteGroup(formData)
+                                }}>
+                                    <input type="hidden" name="groupId" value={group.id} />
+                                    <SubmitButton className="p-2 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors group">
+                                        <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </SubmitButton>
+                                </form>
                             </div>
                         </div>
                     )

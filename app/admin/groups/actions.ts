@@ -35,3 +35,34 @@ export async function removeManager(formData: FormData) {
     revalidatePath('/admin/groups')
     return { success: true }
 }
+
+export async function deleteGroup(formData: FormData) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user || user.email !== 'jundae54@gmail.com') {
+        return { error: 'Unauthorized' }
+    }
+
+    const groupId = formData.get('groupId')
+
+    if (!groupId) {
+        return { error: 'Invalid data' }
+    }
+
+    const adminSupabase = createAdminClient()
+
+    const { error } = await adminSupabase
+        .from('groups')
+        .delete()
+        .eq('id', groupId)
+
+    if (error) {
+        console.error('Delete Group Error:', error)
+        return { error: 'Failed to delete group' }
+    }
+
+    revalidatePath('/admin/groups')
+    revalidatePath('/community')
+    return { success: true }
+}

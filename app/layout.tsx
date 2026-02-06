@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import React from 'react';
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import PWARegister from "@/components/PWARegister";
@@ -79,7 +80,9 @@ export default function RootLayout({
             border: '1px solid #444'
           }
         }} />
-        <RewardToast />
+        <React.Suspense fallback={null}>
+          <RewardToast />
+        </React.Suspense>
       </body>
     </html>
   );

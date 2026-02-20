@@ -268,9 +268,11 @@ export default async function PostPage(props: Props) {
                                 rows={2}
                                 className="w-full rounded-lg border-0 bg-zinc-900 p-3 text-white placeholder-zinc-500 focus:ring-2 focus:ring-brand mb-2"
                             />
-                            <SubmitButton className="text-sm font-semibold text-brand hover:text-brand/80 transition-colors">
-                                Publicar Comentário
-                            </SubmitButton>
+                            <div className="flex justify-end">
+                                <SubmitButton className="px-6 py-2 bg-brand text-white font-bold rounded-full hover:bg-brand/90 transition-all shadow-lg shadow-brand/20 text-sm">
+                                    Publicar Comentário
+                                </SubmitButton>
+                            </div>
                         </div>
                     </form>
                 ) : (

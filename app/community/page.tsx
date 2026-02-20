@@ -149,12 +149,12 @@ function PostCard({ post, highlight = false, groups = [] }: { post: Post & { gro
     const isModerator = post.group?.group_moderators?.some((m: any) => m.user_id === post.author?.id)
 
     return (
-        <article className={`relative rounded-xl border bg-zinc-900/50 p-5 transition-all hover:bg-zinc-800/50 group ${highlight ? 'border-brand/50 shadow-lg shadow-brand/10' : 'border-white/10 hover:border-brand/30'}`}>
-            {/* Main Post Link (Overlay) */}
-            <Link href={`/p/${post.id}`} className="absolute inset-0 z-0" aria-label={`View post: ${post.title}`} />
+        <article className={`relative cursor-pointer rounded-xl border bg-zinc-900/50 p-5 transition-all hover:bg-zinc-800/50 group ${highlight ? 'border-brand/50 shadow-lg shadow-brand/10' : 'border-white/10 hover:border-brand/30'}`}>
+            {/* Main Post Link (Overlay) - z-10 to be above content but below specific buttons */}
+            <Link href={`/p/${post.id}`} className="absolute inset-0 z-10" aria-label={`View post: ${post.title}`} />
 
-            <div className="flex items-center gap-3 mb-3 relative">
-                <div className="h-8 w-8 rounded-full bg-zinc-700 overflow-hidden relative z-0">
+            <div className="flex items-center gap-3 mb-3 relative pointer-events-none">
+                <div className="h-8 w-8 rounded-full bg-zinc-700 overflow-hidden relative z-20 pointer-events-auto">
                     {post.author?.avatar_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={post.author.avatar_url} alt={post.author.username || 'User'} className="h-full w-full object-cover" />
@@ -184,18 +184,18 @@ function PostCard({ post, highlight = false, groups = [] }: { post: Post & { gro
                 {post.group && (
                     <Link
                         href={`/community?category=${post.group.id}&type=${post.group.type}`}
-                        className="ml-auto rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent hover:bg-accent/20 transition-colors relative z-10"
+                        className="ml-auto rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent hover:bg-accent/20 transition-colors relative z-20 pointer-events-auto"
                     >
                         {post.group.name}
                     </Link>
                 )}
             </div>
 
-            <h3 className={`text-lg font-semibold text-white group-hover:text-brand transition-colors relative z-0 ${highlight ? 'text-xl' : ''}`}>
+            <h3 className={`text-lg font-semibold text-white group-hover:text-brand transition-colors relative z-0 pointer-events-none ${highlight ? 'text-xl' : ''}`}>
                 {post.title}
             </h3>
 
-            <p className="mt-2 text-sm text-zinc-400 line-clamp-2 relative z-0">
+            <p className="mt-2 text-sm text-zinc-400 line-clamp-2 relative z-0 pointer-events-none">
                 {post.content}
             </p>
 
@@ -208,7 +208,7 @@ function PostCard({ post, highlight = false, groups = [] }: { post: Post & { gro
             )}
 
             {post.is_pinned && (
-                <div className="absolute top-3 right-3 text-yellow-500 bg-yellow-500/10 p-1.5 rounded-full border border-yellow-500/20 shadow-sm z-10">
+                <div className="absolute top-3 right-3 text-yellow-500 bg-yellow-500/10 p-1.5 rounded-full border border-yellow-500/20 shadow-sm z-20">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                         <path d="M10 2c-1.1 0-2 .9-2 2v2.586l-1.293 1.293A1 1 0 006 8.586V11h3v6h2v-6h3v-2.414a1 1 0 00-.293-.707L12 6.586V4c0-1.1-.9-2-2-2z" />
                     </svg>

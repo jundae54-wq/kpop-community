@@ -8,8 +8,8 @@ export default function GuidePage() {
                 <div className="absolute inset-0 bg-gradient-to-b from-brand/20 via-zinc-950 to-zinc-950 -z-10" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand/10 rounded-full blur-3xl -z-10" />
 
-                <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
-                    Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand to-pink-500">K-Community</span>
+                <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
+                    Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand to-pink-500 whitespace-nowrap">K-Community</span>
                 </h1>
                 <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed">
                     More than just a news feed. It&apos;s your safe, curated space to discover the latest from Korea and connect with real fans without the noise.
@@ -27,7 +27,7 @@ export default function GuidePage() {
                         </div>
                         <h2 className="text-3xl font-bold">Lightning Fast News in Portuguese</h2>
                         <p className="text-zinc-400 text-lg">
-                            Stop using translation tools. Our AI engine curates and translates the hottest K-Entertainment news directly from Korean sources into natural Portuguese, updating you 24/7.
+                            Stop using translation tools. We deliver the absolute fastest K-Entertainment news directly from Korean sources. Be the first to know and become the ultimate K-Pop insider among your friends with our 24/7 natural Portuguese translations.
                         </p>
                     </div>
                     <div className="flex-1 w-full bg-zinc-900 border border-white/10 rounded-2xl p-6 shadow-2xl relative overflow-hidden group">

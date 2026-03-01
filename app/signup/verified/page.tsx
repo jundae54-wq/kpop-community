@@ -23,7 +23,7 @@ export default function SignupVerifiedPage() {
 
                 <div className="pt-4">
                     <Link
-                        href="/login"
+                        href="/login?next=/guide"
                         className="group relative flex w-full justify-center rounded-lg bg-brand px-3 py-3 text-sm font-semibold text-white hover:bg-brand/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand transition-all duration-200"
                     >
                         Ir para Login

@@ -70,6 +70,9 @@ export default function MobileMenu({ dict, user, points }: MobileMenuProps) {
                             <Link href="/write" onClick={close} className="block text-xl font-bold text-zinc-300 hover:text-white">
                                 {dict.navbar.write}
                             </Link>
+                            <Link href="/guide" onClick={close} className="block text-xl font-bold text-zinc-300 hover:text-white">
+                                {(dict as any).navbar.guide}
+                            </Link>
                             <Link href="/messages" onClick={close} className="block text-xl font-bold text-zinc-300 hover:text-white">
                                 Avisos/Mensagens
                             </Link>

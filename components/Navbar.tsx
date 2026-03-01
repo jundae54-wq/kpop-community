@@ -35,7 +35,10 @@ export default async function Navbar() {
                         Loja
                     </Link>
                     <Link href="/write" className="text-zinc-300 hover:text-white transition-colors">
-                        {dict.navbar.write}
+                        {(dict as any).navbar.write}
+                    </Link>
+                    <Link href="/guide" className="text-zinc-300 hover:text-white transition-colors">
+                        {(dict as any).navbar.guide}
                     </Link>
 
                     {user ? (

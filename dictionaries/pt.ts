@@ -7,6 +7,7 @@ export const pt = {
         signin: 'Entrar',
         signout: 'Sair',
         my: 'Eu',
+        guide: 'Como Funciona',
         exit: 'Sair'
     },
     auth: {

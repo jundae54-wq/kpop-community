@@ -44,7 +44,7 @@
   /* 12px */
 }
 
-@theme=]\\\=====\\\\\\\ inline {
+@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

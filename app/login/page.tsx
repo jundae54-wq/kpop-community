@@ -2,9 +2,11 @@ import { login } from '../auth/actions'
 import Link from 'next/link'
 
 export default async function LoginPage(props: {
-    searchParams: Promise<{ message: string; error: string }>
+    searchParams: Promise<{ message?: string; error?: string; next?: string }>
 }) {
     const searchParams = await props.searchParams
+    const nextUrl = searchParams?.next || ''
+
     return (
         // ... (lines 9-68 unchanged effectively, but we replace the button block)
         <div className="flex min-h-[80vh] flex-col items-center justify-center p-4">
@@ -19,6 +21,7 @@ export default async function LoginPage(props: {
                 </div>
 
                 <form className="mt-8 space-y-6">
+                    <input type="hidden" name="nextUrl" value={nextUrl} />
                     <div className="space-y-4 rounded-md shadow-sm">
                         <div>
                             <label htmlFor="email" className="sr-only">

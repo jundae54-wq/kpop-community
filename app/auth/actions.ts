@@ -11,6 +11,7 @@ export async function login(formData: FormData) {
 
     const email = formData.get('email') as string
     const password = formData.get('password') as string
+    const nextUrl = formData.get('nextUrl') as string
 
     const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -28,13 +29,21 @@ export async function login(formData: FormData) {
 
         revalidatePath('/', 'layout')
 
+        // If a nextUrl is provided (like /guide), prioritize it but append reward if necessary
+        if (nextUrl && nextUrl.startsWith('/')) {
+            if (bonusAwarded) {
+                redirect(`${nextUrl}?reward=10`)
+            } else {
+                redirect(nextUrl)
+            }
+        }
+
         if (bonusAwarded) {
             redirect('/?reward=10')
         } else {
             redirect('/')
         }
     }
-
 }
 
 export async function signup(formData: FormData) {

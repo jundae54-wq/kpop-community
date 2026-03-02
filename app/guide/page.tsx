@@ -27,7 +27,7 @@ export default function GuidePage() {
                         </div>
                         <h2 className="text-3xl font-bold">Notícias Relâmpago em Português</h2>
                         <p className="text-zinc-400 text-lg">
-                            Diga adeus aos tradutores automáticos ruins. Nós entregamos as notícias do mundo K-Pop diretamente das fontes coreanas, na velocidade da luz. Seja o primeiro a saber de tudo e torne-se o maior <strong className="text-brand font-semibold">"insider"</strong> entre seus amigos, com atualizações 24 horas por dia em um português perfeito e natural!
+                            Diga adeus aos tradutores automáticos ruins. Nós entregamos as notícias do mundo K-Pop diretamente das fontes coreanas. Com novas atualizações todos os dias às 8h da manhã (Horário de Brasília), você pode se informar rápido no caminho para a escola ou trabalho. Seja o primeiro a saber das novidades e já chegue nos grupos sendo o maior <strong className="text-brand font-semibold">"insider"</strong> para puxar os melhores assuntos!
                         </p>
                     </div>
                     <div className="flex-1 w-full bg-zinc-900 border border-white/10 rounded-2xl p-6 shadow-2xl relative overflow-hidden group">

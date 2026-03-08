@@ -192,7 +192,7 @@ function PostCard({ post, highlight = false, groups = [] }: { post: Post & { gro
                 </div>
                 {post.group && (
                     <Link
-                        href={`/community?category=${post.group.id}&type=${post.group.type}`}
+                        href={`/group/${post.group.slug}`}
                         className="ml-auto rounded-full bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent hover:bg-accent/20 transition-colors relative z-20 pointer-events-auto"
                     >
                         {post.group.name}

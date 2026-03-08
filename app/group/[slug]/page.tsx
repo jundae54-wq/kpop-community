@@ -2,6 +2,8 @@ import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Post } from '@/types/database'
+import { checkFollowStatus } from '@/app/actions/follow'
+import { FollowGroupButton } from '@/components/FollowGroupButton'
 
 export default async function GroupPage({ params }: { params: { slug: string } }) {
     const supabase = await createClient()
@@ -18,6 +20,11 @@ export default async function GroupPage({ params }: { params: { slug: string } }
         notFound()
     }
 
+    const { data: { user } } = await supabase.auth.getUser()
+    const isLoggedIn = !!user
+
+    const { isFollowing, wantsEmail } = await checkFollowStatus(group.id)
+
     // 2. Fetch Posts for this Group
     const { data: posts } = await supabase
         .from('posts')
@@ -32,9 +39,15 @@ export default async function GroupPage({ params }: { params: { slug: string } }
     return (
         <div className="mx-auto max-w-2xl py-8 px-4">
             {/* Group Header */}
-            <div className="mb-8 rounded-2xl bg-gradient-to-r from-brand/20 to-accent/20 p-8 text-center ring-1 ring-white/10">
+            <div className="mb-8 rounded-2xl bg-gradient-to-r from-brand/20 to-accent/20 p-8 text-center ring-1 ring-white/10 flex flex-col items-center">
                 <h1 className="text-4xl font-bold text-white mb-2">{group.name}</h1>
-                <p className="text-zinc-300">{group.description || 'Community Board'}</p>
+                <p className="text-zinc-300 mb-6">{group.description || 'Community Board'}</p>
+                <FollowGroupButton 
+                    groupId={group.id} 
+                    initialIsFollowing={isFollowing} 
+                    initialWantsEmail={wantsEmail} 
+                    isLoggedIn={isLoggedIn} 
+                />
             </div>
 
             <div className="flex items-center justify-between mb-6">

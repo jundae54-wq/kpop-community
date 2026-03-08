@@ -42,6 +42,8 @@ export default async function CommunityPage(props: {
     // 3. Filtered Groups based on selection
     const visibleGroups = type === 'idol' ? idols : type === 'actor' ? actors : []
 
+    const { data: { user } } = await supabase.auth.getUser()
+
     // 4. Main Feed Query
     let query = supabase
         .from('posts')
@@ -61,6 +63,13 @@ export default async function CommunityPage(props: {
     } else if (type) {
         // Filter by group type using !inner join
         query = query.eq('group.type', type)
+    } else if (user) {
+        // Filter by followed groups if the user is authenticated and on the main feed
+        const { data: follows } = await supabase.from('group_followers').select('group_id').eq('user_id', user.id)
+        if (follows && follows.length > 0) {
+            const followedIds = follows.map(f => f.group_id)
+            query = query.in('group_id', followedIds)
+        }
     }
 
     const { data: posts } = await query

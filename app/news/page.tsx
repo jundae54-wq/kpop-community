@@ -11,7 +11,9 @@ export default async function NewsPage() {
     // OR we could check for a specific 'News' group if we created one.
     // Based on current cron logic, group_id is null.
 
-    const { data: posts } = await supabase
+    const { data: { user } } = await supabase.auth.getUser()
+
+    let query = supabase
         .from('posts')
         .select(`
             *,
@@ -20,6 +22,17 @@ export default async function NewsPage() {
         `)
         .like('content', '%Source: [Soompi]%') // Identify news by source signature
         .order('created_at', { ascending: false })
+        .limit(50)
+
+    if (user) {
+        const { data: follows } = await supabase.from('group_followers').select('group_id').eq('user_id', user.id)
+        if (follows && follows.length > 0) {
+            const followedIds = follows.map(f => f.group_id)
+            query = query.in('group_id', followedIds)
+        }
+    }
+
+    const { data: posts } = await query
 
     return (
         <div className="mx-auto max-w-2xl py-8 px-4">

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { processNewsArticle, findLatestArticleUrl } from '@/utils/news-service'
 import { createAdminClient } from '@/utils/supabase/admin'
+import { sendNewPostEmail } from '@/utils/email'
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
@@ -155,6 +156,40 @@ export async function GET(request: Request) {
         if (error) {
             console.error('Supabase Insert Error:', error)
             return NextResponse.json({ error: error.message }, { status: 500 })
+        }
+
+        // --- Fetch followers and send emails (Only for new posts) ---
+        if (group_id && data && data.length > 0 && !postIdToUpdate) {
+            const newPost = data[0]
+            
+            // Get all followers who want emails
+            const { data: follows } = await supabase
+                .from('group_followers')
+                .select('user_id')
+                .eq('group_id', group_id)
+                .eq('wants_email', true)
+
+            if (follows && follows.length > 0) {
+                const userIds = follows.map(f => f.user_id)
+                
+                // Get emails from auth.users using admin API
+                const { data: authData } = await supabase.auth.admin.listUsers({ perPage: 1000 })
+                if (authData && authData.users) {
+                    const emails = authData.users
+                        .filter((u: any) => userIds.includes(u.id) && u.email)
+                        .map((u: any) => u.email as string)
+                    
+                    if (emails.length > 0) {
+                        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+                        await sendNewPostEmail(
+                            emails, 
+                            result.related_artist || 'K-Pop Community', 
+                            result.title, 
+                            `${baseUrl}/p/${newPost.id}`
+                        )
+                    }
+                }
+            }
         }
 
         return NextResponse.json({

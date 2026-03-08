@@ -8,6 +8,8 @@ import GroupSelector from '@/components/GroupSelector'
 import MessageManagerButton from '@/components/MessageManagerButton'
 import ApplyManagerButton from '@/components/ApplyManagerButton'
 
+export const dynamic = 'force-dynamic'
+
 export default async function CommunityPage(props: {
     searchParams: Promise<{ type?: string; category?: string }>
 }) {

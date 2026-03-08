@@ -25,6 +25,7 @@ export default async function NewsPage() {
         .limit(50)
 
     let showFollowPrompt = false
+    let isGuest = false
 
     if (user) {
         const { data: follows } = await supabase.from('group_followers').select('group_id').eq('user_id', user.id)
@@ -35,6 +36,10 @@ export default async function NewsPage() {
             // User is logged in but hasn't followed anyone
             showFollowPrompt = true
         }
+    } else {
+        // Guest user: Only show the 1 most recent news
+        query = query.limit(1)
+        isGuest = true
     }
 
     const { data: posts } = showFollowPrompt ? { data: [] } : await query
@@ -52,9 +57,28 @@ export default async function NewsPage() {
                 {(!posts || posts.length === 0) ? (
                     <EmptyState showFollowPrompt={showFollowPrompt} />
                 ) : (
-                    posts.map((post: Post) => (
-                        <PostCard key={post.id} post={post} />
-                    ))
+                    <>
+                        {posts.map((post: Post) => (
+                            <PostCard key={post.id} post={post} />
+                        ))}
+                        {isGuest && (
+                            <div className="mt-8 rounded-2xl bg-gradient-to-r from-brand/10 to-accent/10 p-8 text-center ring-1 ring-brand/20 backdrop-blur-sm">
+                                <h3 className="text-xl font-bold text-white mb-2">Quer ver mais notícias?</h3>
+                                <p className="text-zinc-300 mb-6 max-w-sm mx-auto">
+                                    Crie uma conta gratuita para acompanhar todas as atualizações diárias dos seus ídolos e atores favoritos.
+                                </p>
+                                <Link
+                                    href="/signup"
+                                    className="inline-block rounded-full bg-brand px-8 py-3 font-bold text-white shadow-lg shadow-brand/20 hover:bg-brand/90 hover:scale-105 transition-all"
+                                >
+                                    Criar Conta Agora
+                                </Link>
+                                <p className="mt-4 text-xs text-zinc-500">
+                                    Já tem uma conta? <Link href="/login" className="text-brand hover:underline">Entre aqui</Link>
+                                </p>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

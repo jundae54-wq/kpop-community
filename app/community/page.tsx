@@ -61,6 +61,7 @@ export default async function CommunityPage(props: {
         .limit(30) // Pagination limit
 
     let showFollowPrompt = false
+    let isGuest = false
 
     if (categoryId) {
         query = query.eq('group_id', categoryId)
@@ -77,6 +78,10 @@ export default async function CommunityPage(props: {
             // User is logged in but hasn't followed anyone, and no filters are active
             showFollowPrompt = true
         }
+    } else {
+        // Guest user on main community feed: Only show the 1 most recent post
+        query = query.limit(1)
+        isGuest = true
     }
 
     const { data: posts } = showFollowPrompt ? { data: [] } : await query
@@ -151,9 +156,28 @@ export default async function CommunityPage(props: {
                 {(!filteredPosts || filteredPosts.length === 0) ? (
                     <EmptyState categoryId={categoryId} showFollowPrompt={showFollowPrompt} />
                 ) : (
-                    filteredPosts.map((post: Post) => (
-                        <PostCard key={post.id} post={post} groups={groups || []} />
-                    ))
+                    <>
+                        {filteredPosts.map((post: Post) => (
+                            <PostCard key={post.id} post={post} groups={groups || []} />
+                        ))}
+                        {isGuest && (
+                            <div className="mt-8 rounded-2xl bg-gradient-to-r from-brand/10 to-accent/10 p-8 text-center ring-1 ring-brand/20 backdrop-blur-sm">
+                                <h3 className="text-xl font-bold text-white mb-2">Quer participar da comunidade?</h3>
+                                <p className="text-zinc-300 mb-6 max-w-sm mx-auto">
+                                    Crie uma conta gratuita para ver todos os posts, interagir com fãs e acompanhar seus ídolos favoritos.
+                                </p>
+                                <Link
+                                    href="/signup"
+                                    className="inline-block rounded-full bg-brand px-8 py-3 font-bold text-white shadow-lg shadow-brand/20 hover:bg-brand/90 hover:scale-105 transition-all"
+                                >
+                                    Criar Conta Agora
+                                </Link>
+                                <p className="mt-4 text-xs text-zinc-500">
+                                    Já tem uma conta? <Link href="/login" className="text-brand hover:underline">Entre aqui</Link>
+                                </p>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

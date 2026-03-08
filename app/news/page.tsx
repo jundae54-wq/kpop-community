@@ -24,15 +24,20 @@ export default async function NewsPage() {
         .order('created_at', { ascending: false })
         .limit(50)
 
+    let showFollowPrompt = false
+
     if (user) {
         const { data: follows } = await supabase.from('group_followers').select('group_id').eq('user_id', user.id)
         if (follows && follows.length > 0) {
             const followedIds = follows.map(f => f.group_id)
             query = query.in('group_id', followedIds)
+        } else {
+            // User is logged in but hasn't followed anyone
+            showFollowPrompt = true
         }
     }
 
-    const { data: posts } = await query
+    const { data: posts } = showFollowPrompt ? { data: [] } : await query
 
     return (
         <div className="mx-auto max-w-2xl py-8 px-4">
@@ -45,7 +50,7 @@ export default async function NewsPage() {
             {/* Feed */}
             <div className="space-y-6">
                 {(!posts || posts.length === 0) ? (
-                    <EmptyState />
+                    <EmptyState showFollowPrompt={showFollowPrompt} />
                 ) : (
                     posts.map((post: Post) => (
                         <PostCard key={post.id} post={post} />
@@ -109,7 +114,7 @@ function PostCard({ post }: { post: Post }) {
     )
 }
 
-function EmptyState() {
+function EmptyState({ showFollowPrompt }: { showFollowPrompt?: boolean }) {
     return (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-700 bg-zinc-900/20 py-20 text-center">
             <div className="rounded-full bg-zinc-800 p-4 mb-4">
@@ -117,10 +122,27 @@ function EmptyState() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
-            <h3 className="text-lg font-semibold text-white">Nenhuma notícia ainda</h3>
-            <p className="text-sm text-zinc-500 max-w-xs mx-auto mt-2">
-                Aguardando o ciclo diário.
-            </p>
+            {showFollowPrompt ? (
+                <>
+                    <h3 className="text-lg font-semibold text-white">Seu feed de notícias está vazio</h3>
+                    <p className="text-sm text-zinc-500 max-w-xs mx-auto mt-2 mb-6">
+                        Siga seus ídolos e atores favoritos para ver as notícias deles aqui!
+                    </p>
+                    <Link
+                        href="/community?type=idol"
+                        className="bg-brand text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-brand/90 transition-colors"
+                    >
+                        Descobrir Artistas
+                    </Link>
+                </>
+            ) : (
+                <>
+                    <h3 className="text-lg font-semibold text-white">Nenhuma notícia ainda</h3>
+                    <p className="text-sm text-zinc-500 max-w-xs mx-auto mt-2">
+                        Aguardando o ciclo diário.
+                    </p>
+                </>
+            )}
         </div>
     )
 }

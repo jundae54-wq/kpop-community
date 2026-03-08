@@ -58,6 +58,8 @@ export default async function CommunityPage(props: {
         .order('created_at', { ascending: false })
         .limit(30) // Pagination limit
 
+    let showFollowPrompt = false
+
     if (categoryId) {
         query = query.eq('group_id', categoryId)
     } else if (type) {
@@ -69,10 +71,13 @@ export default async function CommunityPage(props: {
         if (follows && follows.length > 0) {
             const followedIds = follows.map(f => f.group_id)
             query = query.in('group_id', followedIds)
+        } else {
+            // User is logged in but hasn't followed anyone, and no filters are active
+            showFollowPrompt = true
         }
     }
 
-    const { data: posts } = await query
+    const { data: posts } = showFollowPrompt ? { data: [] } : await query
     const filteredPosts = posts || []
 
     return (
@@ -142,7 +147,7 @@ export default async function CommunityPage(props: {
             </div>
             <div className="space-y-6">
                 {(!filteredPosts || filteredPosts.length === 0) ? (
-                    <EmptyState categoryId={categoryId} />
+                    <EmptyState categoryId={categoryId} showFollowPrompt={showFollowPrompt} />
                 ) : (
                     filteredPosts.map((post: Post) => (
                         <PostCard key={post.id} post={post} groups={groups || []} />
@@ -227,7 +232,7 @@ function PostCard({ post, highlight = false, groups = [] }: { post: Post & { gro
     )
 }
 
-function EmptyState({ categoryId }: { categoryId: number | null }) {
+function EmptyState({ categoryId, showFollowPrompt }: { categoryId: number | null, showFollowPrompt?: boolean }) {
     return (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-700 bg-zinc-900/20 py-20 text-center">
             <div className="rounded-full bg-zinc-800 p-4 mb-4">
@@ -235,16 +240,42 @@ function EmptyState({ categoryId }: { categoryId: number | null }) {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
-            <h3 className="text-lg font-semibold text-white">Nenhum post ainda</h3>
-            <p className="text-sm text-zinc-500 max-w-xs mx-auto mt-2 mb-6">
-                Seja o primeiro fã a começar uma discussão!
-            </p>
-            <Link
-                href={categoryId ? `/write?group_id=${categoryId}` : '/write'}
-                className="bg-brand text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-brand/90 transition-colors"
-            >
-                Criar Post
-            </Link>
+            
+            {showFollowPrompt ? (
+                <>
+                    <h3 className="text-lg font-semibold text-white">Seu feed da comunidade está vazio</h3>
+                    <p className="text-sm text-zinc-500 max-w-xs mx-auto mt-2 mb-6">
+                        Siga seus ídolos e atores favoritos para ver os posts deles aqui!
+                    </p>
+                    <div className="flex gap-4">
+                        <Link
+                            href="/community?type=idol"
+                            className="bg-brand text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-brand/90 transition-colors"
+                        >
+                            Ver Ídolos
+                        </Link>
+                        <Link
+                            href="/community?type=actor"
+                            className="bg-blue-500 text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-blue-600 transition-colors"
+                        >
+                            Ver Atores
+                        </Link>
+                    </div>
+                </>
+            ) : (
+                <>
+                    <h3 className="text-lg font-semibold text-white">Nenhum post ainda</h3>
+                    <p className="text-sm text-zinc-500 max-w-xs mx-auto mt-2 mb-6">
+                        Seja o primeiro fã a começar uma discussão!
+                    </p>
+                    <Link
+                        href={categoryId ? `/write?group_id=${categoryId}` : '/write'}
+                        className="bg-brand text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-brand/90 transition-colors"
+                    >
+                        Criar Post
+                    </Link>
+                </>
+            )}
         </div>
     )
 }
